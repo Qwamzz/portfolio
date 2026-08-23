@@ -4,7 +4,7 @@ Personal portfolio site for a Cloud Infrastructure / DevOps / Data Engineer, bui
 HTML, CSS and JavaScript and served on Azure App Service (Linux, Python) by a small Flask
 static-file server.
 
-Live site: https://yartey-portfolio.azurewebsites.net
+Live site: https://portfoliosite.azurewebsites.net
 
 ## Pages
 
@@ -42,9 +42,10 @@ headers and serve extensionless URLs such as `/projects`.
 
 ## Deployment
 
-Pushes to `main` deploy to Azure App Service through
-[.github/workflows/azure-webapps.yml](.github/workflows/azure-webapps.yml), which uses a
-publish profile stored as the `AZURE_WEBAPP_PUBLISH_PROFILE` repository secret.
+Pushes to `main` deploy to the `portfoliosite` web app through
+[.github/workflows/main_portfoliosite.yml](.github/workflows/main_portfoliosite.yml), the
+workflow the Azure portal's Deployment Center generated when the web app was connected to this
+repository. It signs in with federated credentials, so no publish profile or password is stored.
 
 `deploy-azure.sh` provisions the App Service plan and web app from scratch and can also deploy
 directly with `az webapp up`, which is useful when GitHub Actions is not available. See
@@ -64,6 +65,6 @@ requirements.txt           Flask and gunicorn
 assets/css/style.css       All styling, including both theme palettes
 assets/js/main.js          Theme toggle, mobile nav, accordions, scroll reveal
 assets/img/*.svg           Illustrations and favicon
-.github/workflows/         Build and deploy workflow
+.github/workflows/         Deploy workflow from Azure Deployment Center
 deploy-azure.sh            One-shot Azure provisioning and deployment
 ```

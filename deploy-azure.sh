@@ -11,7 +11,7 @@ set -euo pipefail
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-yartey-portfolio}"
 LOCATION="${LOCATION:-westeurope}"
 PLAN="${PLAN:-asp-yartey-portfolio}"
-APP_NAME="${APP_NAME:-yartey-portfolio}"
+APP_NAME="${APP_NAME:-portfoliosite}"
 SKU="${SKU:-F1}"
 RUNTIME="${RUNTIME:-PYTHON:3.12}"
 STARTUP="gunicorn --bind=0.0.0.0 --timeout 600 app:app"
