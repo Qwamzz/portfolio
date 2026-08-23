@@ -15,7 +15,7 @@ gunicorn --bind=0.0.0.0 --timeout 600 app:app
 | --- | --- |
 | Web app | `portfoliosite` |
 | Runtime | Python 3.12 on Linux |
-| URL | `https://portfoliosite.azurewebsites.net` |
+| URL | `https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net` |
 | Deployment | GitHub Actions via Deployment Center |
 | Workflow | [.github/workflows/main_portfoliosite.yml](.github/workflows/main_portfoliosite.yml) |
 
@@ -56,8 +56,8 @@ Save either setting and App Service restarts the app.
 ## Verifying a deployment
 
 ```bash
-curl -fsS https://portfoliosite.azurewebsites.net/healthz
-curl -o /dev/null -s -w '%{http_code}\n' https://portfoliosite.azurewebsites.net/
+curl -fsS https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net/healthz
+curl -o /dev/null -s -w '%{http_code}\n' https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net/
 ```
 
 Expect `{"status":"ok"}` and `200`. Live logs:
@@ -99,7 +99,7 @@ az webapp config ssl create --resource-group <your-resource-group> \
 ```
 
 A managed certificate requires at least `B1` and a `CNAME` record pointing at
-`portfoliosite.azurewebsites.net`.
+`portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net`.
 
 ## Troubleshooting
 
@@ -109,5 +109,5 @@ A managed certificate requires at least `B1` and a `CNAME` record pointing at
 - **Default Azure welcome page still showing** - the first deployment has not finished, or it
   deployed while the startup command was still empty. Re-run the workflow after setting it.
 - **CSS or images 404** - confirm `assets/` reached the web app; browse the file system under
-  `https://portfoliosite.scm.azurewebsites.net/newui/fileManager`.
+  `https://portfoliosite-fuedesckb9cxe3cf.scm.uksouth-01.azurewebsites.net/newui/fileManager`.
 - **A deployment succeeds but the old site is served** - `az webapp restart` clears it.
