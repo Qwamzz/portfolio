@@ -1,8 +1,8 @@
 """Portfolio site server, sized for Azure App Service (Linux, Python).
 
-Mostly it serves static HTML, CSS, JS and SVG. On top of that it keeps the
-certifications list in a JSON file so new certificates can be added through
-/admin without editing any code or redeploying.
+The pages are static HTML, CSS, JS and SVG. Their content comes from a small
+JSON store on the persistent volume, so every section can be edited at /admin
+without touching code or redeploying. See content_schema.py for the collections.
 
 App Service runs this with gunicorn (see DEPLOY.md), which needs a WSGI
 callable named `app`.
@@ -19,30 +19,29 @@ import time
 import uuid
 from datetime import datetime, timezone
 
-from flask import (Flask, Response, jsonify, request, send_from_directory,
-                   session)
+from flask import Flask, Response, jsonify, request, send_from_directory, session
 from werkzeug.utils import secure_filename
+
+from content_schema import SCHEMA, SEPARATE_FILES
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# /home is the persistent volume on App Service; anything written to the site
-# directory is replaced on the next deployment.
+# /home is the persistent volume on App Service; the site directory is replaced
+# on every deployment, so nothing editable may live there.
 if os.path.isdir("/home") and os.access("/home", os.W_OK):
     DATA_DIR = os.environ.get("DATA_DIR", "/home/data")
 else:
     DATA_DIR = os.environ.get("DATA_DIR", os.path.join(ROOT, "data", "store"))
 
 UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
+CONTENT_FILE = os.path.join(DATA_DIR, "content.json")
 CERTS_FILE = os.path.join(DATA_DIR, "certifications.json")
-MESSAGES_FILE = os.path.join(DATA_DIR, "messages.json")
-SEED_FILE = os.path.join(ROOT, "data", "certifications.seed.json")
-
-MAX_MESSAGES = 500
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$")
+CONTENT_SEED = os.path.join(ROOT, "data", "content.seed.json")
+CERTS_SEED = os.path.join(ROOT, "data", "certifications.seed.json")
 
 ALLOWED_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".pdf"}
-CATEGORIES = ["Microsoft", "Cloud & Cloud Native", "Security & Standards", "Other"]
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+MAX_FIELD_LEN = 6000
 
 mimetypes.add_type("image/svg+xml", ".svg")
 mimetypes.add_type("text/css", ".css")
@@ -55,15 +54,15 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=os.environ.get("WEBSITE_HOSTNAME") is not None,
 )
-# A generated key logs the admin out on restart, which is an acceptable default;
-# set SECRET_KEY in the app settings to keep sessions across restarts.
+# Keep the schema in the order it is declared so the admin menu reads Home first.
+app.json.sort_keys = False
+
 app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 PAGES = ("index", "education", "experience", "projects", "certifications", "contact")
 
-# Crude in-process throttle so the login form cannot be hammered.
 _failures = {}
 
 
@@ -73,53 +72,109 @@ _failures = {}
 
 def _ensure_store():
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    if not os.path.isfile(CERTS_FILE) and os.path.isfile(SEED_FILE):
-        shutil.copyfile(SEED_FILE, CERTS_FILE)
+    if not os.path.isfile(CERTS_FILE) and os.path.isfile(CERTS_SEED):
+        shutil.copyfile(CERTS_SEED, CERTS_FILE)
+    if not os.path.isfile(CONTENT_FILE) and os.path.isfile(CONTENT_SEED):
+        shutil.copyfile(CONTENT_SEED, CONTENT_FILE)
 
 
-def load_certifications():
-    _ensure_store()
+def _read_json(path, fallback):
     try:
-        with open(CERTS_FILE, "r", encoding="utf-8") as handle:
-            data = json.load(handle)
-        return data if isinstance(data, list) else []
+        with open(path, "r", encoding="utf-8") as handle:
+            return json.load(handle)
     except (OSError, ValueError):
-        return []
+        return fallback
 
 
-def save_certifications(items):
-    _ensure_store()
-    tmp = CERTS_FILE + ".tmp"
+def _write_json(path, data):
+    tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as handle:
-        json.dump(items, handle, indent=2, ensure_ascii=False)
-    os.replace(tmp, CERTS_FILE)
+        json.dump(data, handle, indent=2, ensure_ascii=False)
+    os.replace(tmp, path)
 
 
-def load_messages():
+def load_collection(name):
     _ensure_store()
-    try:
-        with open(MESSAGES_FILE, "r", encoding="utf-8") as handle:
-            data = json.load(handle)
+    if name in SEPARATE_FILES:
+        data = _read_json(CERTS_FILE, [])
         return data if isinstance(data, list) else []
-    except (OSError, ValueError):
-        return []
+    content = _read_json(CONTENT_FILE, {})
+    items = content.get(name, []) if isinstance(content, dict) else []
+    return items if isinstance(items, list) else []
 
 
-def save_messages(items):
+def save_collection(name, items):
     _ensure_store()
-    tmp = MESSAGES_FILE + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as handle:
-        json.dump(items, handle, indent=2, ensure_ascii=False)
-    os.replace(tmp, MESSAGES_FILE)
+    if name in SEPARATE_FILES:
+        _write_json(CERTS_FILE, items)
+        return
+    content = _read_json(CONTENT_FILE, {})
+    if not isinstance(content, dict):
+        content = {}
+    content[name] = items
+    _write_json(CONTENT_FILE, content)
 
 
-def _slug(value):
-    value = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
-    return value[:48] or uuid.uuid4().hex[:8]
+def load_all():
+    return {name: load_collection(name) for name in SCHEMA}
 
 
 # --------------------------------------------------------------------------
-# Auth helpers
+# Validation
+# --------------------------------------------------------------------------
+
+def _slug(value):
+    value = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
+    return value[:40] or uuid.uuid4().hex[:8]
+
+
+def clean_item(collection, form, existing=None):
+    """Build an item from submitted form data. Returns (item, error)."""
+    spec = SCHEMA[collection]
+    item = dict(existing or {})
+
+    for field in spec["fields"]:
+        name = field["name"]
+        if field["type"] == "file":
+            continue
+        if name not in form and existing is not None:
+            continue
+
+        raw = (form.get(name) or "").strip()
+        if len(raw) > MAX_FIELD_LEN:
+            return None, "%s is too long." % field["label"]
+
+        if field["type"] == "lines":
+            item[name] = [line.strip() for line in raw.splitlines() if line.strip()]
+        elif field["type"] == "select":
+            options = field.get("options", [])
+            item[name] = raw if raw in options else (options[0] if options else raw)
+        elif field["type"] == "url":
+            if raw and not raw.startswith(("http://", "https://")):
+                return None, "%s must start with http:// or https://" % field["label"]
+            item[name] = raw
+        else:
+            item[name] = raw
+
+        if field.get("required") and not item.get(name):
+            return None, "%s is required." % field["label"]
+
+    return item, None
+
+
+def _store_upload(collection, item, upload):
+    ext = os.path.splitext(upload.filename)[1].lower()
+    if ext not in ALLOWED_EXT:
+        return "Allowed file types: PNG, JPG, WEBP, GIF, PDF."
+    _ensure_store()
+    stored = secure_filename(item["id"] + ext)
+    upload.save(os.path.join(UPLOAD_DIR, stored))
+    item["file"] = "/uploads/" + stored
+    return None
+
+
+# --------------------------------------------------------------------------
+# Auth
 # --------------------------------------------------------------------------
 
 def admin_enabled():
@@ -131,7 +186,6 @@ def is_admin():
 
 
 def require_admin():
-    """Return an error response when the caller may not write, else None."""
     if not admin_enabled():
         return jsonify(error="Admin is disabled. Set ADMIN_PASSWORD to enable it."), 503
     if not is_admin():
@@ -144,203 +198,146 @@ def _throttled(key):
     if not record:
         return False
     count, last = record
-    if count < 5:
-        return False
-    return (time.time() - last) < 300
+    return count >= 5 and (time.time() - last) < 300
 
 
 # --------------------------------------------------------------------------
-# Static site
+# Content API
 # --------------------------------------------------------------------------
 
-def _send(relpath):
-    response = send_from_directory(ROOT, relpath)
-    if relpath.startswith("assets/"):
-        response.headers["Cache-Control"] = "public, max-age=3600"
-    else:
-        response.headers["Cache-Control"] = "no-cache"
-    return response
+@app.route("/api/content")
+def api_content():
+    return jsonify(content=load_all(), admin=is_admin(), adminEnabled=admin_enabled())
 
 
-@app.route("/")
-def home():
-    return _send("index.html")
+@app.route("/api/schema")
+def api_schema():
+    return jsonify(schema=SCHEMA, admin=is_admin(), adminEnabled=admin_enabled())
 
 
-@app.route("/healthz")
-def healthz():
-    return {"status": "ok", "certifications": len(load_certifications())}
+@app.route("/api/content/<collection>")
+def api_collection(collection):
+    if collection not in SCHEMA:
+        return jsonify(error="Unknown collection."), 404
+    return jsonify(items=load_collection(collection))
 
 
-@app.route("/uploads/<path:name>")
-def uploaded_file(name):
-    safe = secure_filename(name)
-    if not safe or not os.path.isfile(os.path.join(UPLOAD_DIR, safe)):
-        return _not_found(None)
-    response = send_from_directory(UPLOAD_DIR, safe)
-    response.headers["Cache-Control"] = "public, max-age=86400"
-    return response
-
-
-# --------------------------------------------------------------------------
-# Certifications API
-# --------------------------------------------------------------------------
-
-@app.route("/api/certifications")
-def api_certifications():
-    return jsonify(
-        categories=CATEGORIES,
-        items=load_certifications(),
-        admin=is_admin(),
-        adminEnabled=admin_enabled(),
-    )
-
-
-@app.route("/api/certifications", methods=["POST"])
-def api_add_certification():
+@app.route("/api/content/<collection>", methods=["POST"])
+def api_create(collection):
     denied = require_admin()
     if denied:
         return denied
+    if collection not in SCHEMA:
+        return jsonify(error="Unknown collection."), 404
 
-    form = request.form
-    name = (form.get("name") or "").strip()
-    if not name:
-        return jsonify(error="A certification name is required."), 400
+    spec = SCHEMA[collection]
+    items = load_collection(collection)
+    if spec.get("single") and items:
+        return jsonify(error="This section holds a single entry - edit the existing one."), 400
 
-    category = form.get("category") or CATEGORIES[-1]
-    if category not in CATEGORIES:
-        category = CATEGORIES[-1]
+    item, error = clean_item(collection, request.form)
+    if error:
+        return jsonify(error=error), 400
 
-    item = {
-        "id": _slug(form.get("code") or name) + "-" + uuid.uuid4().hex[:4],
-        "name": name[:160],
-        "code": (form.get("code") or "").strip()[:12] or "CERT",
-        "issuer": (form.get("issuer") or "").strip()[:80],
-        "category": category,
-        "note": (form.get("note") or "").strip()[:120],
-        "url": (form.get("url") or "").strip()[:400],
-        "added": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-    }
-
-    if item["url"] and not item["url"].startswith(("http://", "https://")):
-        return jsonify(error="The credential link must start with http:// or https://"), 400
+    item["id"] = _slug(item.get(spec["title_field"], collection)) + "-" + uuid.uuid4().hex[:4]
+    item["added"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     upload = request.files.get("file")
     if upload and upload.filename:
-        ext = os.path.splitext(upload.filename)[1].lower()
-        if ext not in ALLOWED_EXT:
-            return jsonify(error="Allowed file types: PNG, JPG, WEBP, GIF, PDF."), 400
-        _ensure_store()
-        stored = item["id"] + ext
-        upload.save(os.path.join(UPLOAD_DIR, stored))
-        item["file"] = "/uploads/" + stored
+        error = _store_upload(collection, item, upload)
+        if error:
+            return jsonify(error=error), 400
 
-    items = load_certifications()
     items.append(item)
-    save_certifications(items)
+    save_collection(collection, items)
     return jsonify(item=item), 201
 
 
-@app.route("/api/certifications/<cert_id>", methods=["DELETE"])
-def api_delete_certification(cert_id):
+@app.route("/api/content/<collection>/<item_id>", methods=["PUT", "POST"])
+def api_update(collection, item_id):
     denied = require_admin()
     if denied:
         return denied
+    if collection not in SCHEMA:
+        return jsonify(error="Unknown collection."), 404
 
-    items = load_certifications()
-    remaining = [c for c in items if c.get("id") != cert_id]
+    items = load_collection(collection)
+    for index, existing in enumerate(items):
+        if existing.get("id") != item_id:
+            continue
+
+        item, error = clean_item(collection, request.form, existing)
+        if error:
+            return jsonify(error=error), 400
+
+        upload = request.files.get("file")
+        if upload and upload.filename:
+            error = _store_upload(collection, item, upload)
+            if error:
+                return jsonify(error=error), 400
+
+        items[index] = item
+        save_collection(collection, items)
+        return jsonify(item=item)
+
+    return jsonify(error="No entry with that id."), 404
+
+
+@app.route("/api/content/<collection>/<item_id>", methods=["DELETE"])
+def api_delete(collection, item_id):
+    denied = require_admin()
+    if denied:
+        return denied
+    if collection not in SCHEMA:
+        return jsonify(error="Unknown collection."), 404
+
+    items = load_collection(collection)
+    remaining = [i for i in items if i.get("id") != item_id]
     if len(remaining) == len(items):
-        return jsonify(error="No certification with that id."), 404
+        return jsonify(error="No entry with that id."), 404
 
-    for cert in items:
-        if cert.get("id") == cert_id and cert.get("file"):
-            path = os.path.join(UPLOAD_DIR, os.path.basename(cert["file"]))
+    for item in items:
+        if item.get("id") == item_id and item.get("file"):
+            path = os.path.join(UPLOAD_DIR, os.path.basename(item["file"]))
             if os.path.isfile(path):
                 os.remove(path)
 
-    save_certifications(remaining)
+    save_collection(collection, remaining)
     return jsonify(ok=True)
 
 
-# --------------------------------------------------------------------------
-# Contact messages
-# --------------------------------------------------------------------------
-
-@app.route("/api/messages", methods=["POST"])
-def api_post_message():
-    payload = request.get_json(silent=True) or request.form
-
-    # Bots fill every field they find; a real visitor never sees this one.
-    if (payload.get("website") or "").strip():
-        return jsonify(ok=True), 202
-
-    name = (payload.get("name") or "").strip()
-    email = (payload.get("email") or "").strip()
-    body = (payload.get("message") or "").strip()
-
-    if not name or not email or not body:
-        return jsonify(error="Name, email and message are all required."), 400
-    if not EMAIL_RE.match(email):
-        return jsonify(error="That email address does not look right."), 400
-    if len(body) < 10:
-        return jsonify(error="Please write a little more so I can help."), 400
-    if len(body) > 4000 or len(name) > 120 or len(email) > 160:
-        return jsonify(error="That message is too long."), 400
-
-    key = "msg:" + (request.remote_addr or "unknown")
-    count, last = _failures.get(key, (0, 0.0))
-    if count >= 5 and (time.time() - last) < 900:
-        return jsonify(error="Too many messages just now. Please try again shortly."), 429
-    _failures[key] = (count + 1 if (time.time() - last) < 900 else 1, time.time())
-
-    messages = load_messages()
-    messages.insert(0, {
-        "id": uuid.uuid4().hex[:12],
-        "name": name,
-        "email": email,
-        "subject": (payload.get("subject") or "").strip()[:160],
-        "message": body,
-        "received": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        "read": False,
-    })
-    save_messages(messages[:MAX_MESSAGES])
-    return jsonify(ok=True), 201
-
-
-@app.route("/api/messages")
-def api_list_messages():
+@app.route("/api/content/<collection>/<item_id>/move", methods=["POST"])
+def api_move(collection, item_id):
     denied = require_admin()
     if denied:
         return denied
-    messages = load_messages()
-    return jsonify(items=messages, unread=sum(1 for m in messages if not m.get("read")))
+    if collection not in SCHEMA:
+        return jsonify(error="Unknown collection."), 404
 
-
-@app.route("/api/messages/<message_id>", methods=["PATCH"])
-def api_mark_message(message_id):
-    denied = require_admin()
-    if denied:
-        return denied
-    messages = load_messages()
-    for message in messages:
-        if message.get("id") == message_id:
-            message["read"] = bool((request.get_json(silent=True) or {}).get("read", True))
-            save_messages(messages)
+    direction = (request.get_json(silent=True) or {}).get("direction", "up")
+    items = load_collection(collection)
+    for index, item in enumerate(items):
+        if item.get("id") != item_id:
+            continue
+        target = index - 1 if direction == "up" else index + 1
+        if target < 0 or target >= len(items):
             return jsonify(ok=True)
-    return jsonify(error="No message with that id."), 404
+        items[index], items[target] = items[target], items[index]
+        save_collection(collection, items)
+        return jsonify(ok=True)
+
+    return jsonify(error="No entry with that id."), 404
 
 
-@app.route("/api/messages/<message_id>", methods=["DELETE"])
-def api_delete_message(message_id):
-    denied = require_admin()
-    if denied:
-        return denied
-    messages = load_messages()
-    remaining = [m for m in messages if m.get("id") != message_id]
-    if len(remaining) == len(messages):
-        return jsonify(error="No message with that id."), 404
-    save_messages(remaining)
-    return jsonify(ok=True)
+# Kept so anything pointing at the old endpoint keeps working.
+@app.route("/api/certifications")
+def api_certifications():
+    return jsonify(
+        categories=SCHEMA["certifications"]["fields"][3]["options"],
+        items=load_collection("certifications"),
+        admin=is_admin(),
+        adminEnabled=admin_enabled(),
+    )
 
 
 # --------------------------------------------------------------------------
@@ -385,21 +382,47 @@ def admin_page():
 
 
 # --------------------------------------------------------------------------
-# Catch-all and errors
+# Static site
 # --------------------------------------------------------------------------
+
+def _send(relpath):
+    response = send_from_directory(ROOT, relpath)
+    if relpath.startswith("assets/"):
+        response.headers["Cache-Control"] = "public, max-age=3600"
+    else:
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
+@app.route("/")
+def home():
+    return _send("index.html")
+
+
+@app.route("/healthz")
+def healthz():
+    return {"status": "ok", "certifications": len(load_collection("certifications"))}
+
+
+@app.route("/uploads/<path:name>")
+def uploaded_file(name):
+    safe = secure_filename(name)
+    if not safe or not os.path.isfile(os.path.join(UPLOAD_DIR, safe)):
+        return _not_found(None)
+    response = send_from_directory(UPLOAD_DIR, safe)
+    response.headers["Cache-Control"] = "public, max-age=86400"
+    return response
+
 
 @app.route("/<path:path>")
 def static_files(path):
     candidate = os.path.normpath(os.path.join(ROOT, path))
     if not candidate.startswith(ROOT):
         return _not_found(None)
-
     if os.path.isfile(candidate):
         return _send(path)
-
     if path.rstrip("/") in PAGES and os.path.isfile(candidate.rstrip(os.sep) + ".html"):
         return _send(path.rstrip("/") + ".html")
-
     return _not_found(None)
 
 
