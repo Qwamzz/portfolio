@@ -53,10 +53,11 @@ Two settings the deployment itself does not set:
 
 Save either setting and App Service restarts the app.
 
-## Turning on the certifications admin
+## Turning on the site admin
 
-`/admin` lets you add and delete certifications - including uploading the certificate file -
-without editing code or redeploying. It stays switched off until a password is configured.
+`/admin` lets you edit every section of the site - home, education, experience, projects,
+certifications (including certificate uploads) and contact - without editing code or
+redeploying. It stays switched off until a password is configured.
 
 Under **Configuration -> Application settings** add:
 
@@ -79,10 +80,11 @@ Then open `https://<your-app>.azurewebsites.net/admin` and sign in.
 
 ### Where the data lives
 
-Certifications are stored as JSON at `/home/data/certifications.json`, contact form messages at
-`/home/data/messages.json`, and uploaded certificate files in `/home/data/uploads/`. `/home` is the persistent volume on App Service, so **the data survives
+Page content is stored as JSON at `/home/data/content.json`, certifications at
+`/home/data/certifications.json`, and uploaded certificate files in `/home/data/uploads/`. `/home` is the persistent volume on App Service, so **the data survives
 restarts and deployments** - deployments only replace `/home/site/wwwroot`. On first run the
-file is seeded from `data/certifications.seed.json` in the repository.
+files are seeded from `data/content.seed.json` and `data/certifications.seed.json` in the
+repository, so an existing store is never overwritten by a deployment.
 
 Back it up or inspect it any time:
 

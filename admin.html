@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Certifications Admin</title>
+<title>Site Admin</title>
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -15,7 +15,6 @@
     <a class="brand" href="index.html">&lt; Nii Yartey Gidiglo <span>/&gt;</span></a>
     <div class="nav-right">
       <ul class="nav-links">
-        <li><a href="certifications.html">View certifications</a></li>
         <li><a href="index.html">Back to site</a></li>
       </ul>
       <button class="theme-toggle" type="button" aria-label="Toggle theme">☾</button>
@@ -28,17 +27,17 @@
 
 <section class="page-head">
   <div class="wrap">
-    <h1>Certifications Admin</h1>
-    <p>Add a certification and it appears on the public page immediately. No code changes, no redeploy.</p>
+    <h1>Site Admin</h1>
+    <p>Every section of the site is editable here. Changes go live immediately - no code changes, no redeploy.</p>
   </div>
 </section>
 
 <section class="section">
-  <div class="wrap admin-wrap">
+  <div class="wrap">
 
-    <div class="card" id="login-card" hidden>
+    <div class="card admin-narrow" id="login-card" hidden>
       <h3>Sign in</h3>
-      <p>Enter the admin password to manage certifications.</p>
+      <p>Enter the admin password to manage the site.</p>
       <form id="login-form" class="admin-form" autocomplete="off">
         <label>Password
           <input type="password" name="password" required autocomplete="current-password">
@@ -47,57 +46,42 @@
       </form>
     </div>
 
-    <div class="card" id="disabled-card" hidden>
+    <div class="card admin-narrow" id="disabled-card" hidden>
       <h3>Admin is switched off</h3>
       <p>No <code>ADMIN_PASSWORD</code> is configured on the web app, so the admin area is disabled
          and nothing can be changed through it. Set that application setting in Azure to turn it on.</p>
     </div>
 
     <div id="admin-panel" hidden>
-      <div class="card">
-        <div class="admin-head">
-          <h3>Add a certification</h3>
-          <button class="btn btn-outline" type="button" id="logout">Sign out</button>
-        </div>
-        <form id="cert-form" class="admin-form">
-          <div class="admin-grid">
-            <label>Name <span class="req">required</span>
-              <input name="name" required placeholder="Azure Solutions Architect Expert">
-            </label>
-            <label>Short code
-              <input name="code" placeholder="AZ-305" maxlength="12">
-            </label>
-            <label>Issuer
-              <input name="issuer" placeholder="Microsoft" maxlength="80">
-            </label>
-            <label>Category
-              <select name="category" id="category"></select>
-            </label>
-            <label>Note
-              <input name="note" placeholder="Expert level" maxlength="120">
-            </label>
-            <label>Credential link
-              <input name="url" type="url" placeholder="https://learn.microsoft.com/...">
-            </label>
+      <div class="admin-layout">
+
+        <aside class="admin-side">
+          <div class="admin-side-head">
+            <strong>Sections</strong>
+            <button class="btn btn-outline" type="button" id="logout">Sign out</button>
           </div>
-          <label>Certificate file (PNG, JPG, WEBP, GIF or PDF, up to 8 MB)
-            <input type="file" name="file" accept=".png,.jpg,.jpeg,.webp,.gif,.pdf">
-          </label>
-          <button class="btn" type="submit">Add certification</button>
-        </form>
-      </div>
+          <nav id="collection-nav"></nav>
+        </aside>
 
-      <div class="card">
-        <h3>Current certifications (<span id="count">0</span>)</h3>
-        <ul class="admin-list" id="list"></ul>
-      </div>
+        <div class="admin-main">
+          <div class="card">
+            <div class="admin-head">
+              <h3 id="collection-title">Section</h3>
+              <button class="btn" type="button" id="add-new">Add entry</button>
+            </div>
+            <p class="admin-hint" id="collection-hint"></p>
+            <ul class="admin-list" id="list"></ul>
+          </div>
 
-      <div class="card">
-        <div class="admin-head">
-          <h3>Messages (<span id="msg-count">0</span>)</h3>
-          <span class="unread-pill" id="unread" hidden></span>
+          <div class="card" id="editor-card" hidden>
+            <div class="admin-head">
+              <h3 id="editor-title">New entry</h3>
+              <button class="btn btn-outline" type="button" id="cancel-edit">Cancel</button>
+            </div>
+            <form id="item-form" class="admin-form"></form>
+          </div>
         </div>
-        <ul class="admin-list messages" id="messages"></ul>
+
       </div>
     </div>
 

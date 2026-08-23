@@ -1,0 +1,247 @@
+{
+  "profile": [
+    {
+      "id": "profile",
+      "name": "Nii Yartey Gidiglo",
+      "tagline": "( Cloud · DevOps · Data Engineer )",
+      "lede": "Cloud Engineer with deep experience migrating enterprise workloads to Azure and AWS, deploying security solutions, and building CI/CD pipelines and data platforms that are scalable, fault-tolerant and cost-optimised."
+    }
+  ],
+  "stats": [
+    {"id": "stat-certs", "value": "8+", "label": "Microsoft Azure certifications"},
+    {"id": "stat-migrations", "value": "50+", "label": "Cloud migration projects delivered"},
+    {"id": "stat-sentinel", "value": "20+", "label": "Enterprise Sentinel deployments"},
+    {"id": "stat-trained", "value": "70+", "label": "IT professionals trained"}
+  ],
+  "skills": [
+    {
+      "id": "skill-cloud",
+      "title": "Cloud Infrastructure & Architecture",
+      "image": "assets/img/cloud-hero.svg",
+      "tags": ["Azure", "AWS", "GCP", "Oracle Cloud", "App Service", "Azure Functions", "Site Recovery", "ExpressRoute"],
+      "bullets": [
+        "Cloud adoption assessments using Microsoft's Cloud Adoption Framework, guiding clients through migration and deployment phases.",
+        "Workload migrations to Azure PaaS and IaaS - on-premises, VMware/Hyper-V, AWS, GCP and OCI sources.",
+        "Scalable, fault-tolerant architectures with high availability, BCDR and Azure Site Recovery.",
+        "Hybrid connectivity with Site-to-Site VPN, VNet design, NSG hardening and cost rightsizing."
+      ]
+    },
+    {
+      "id": "skill-devops",
+      "title": "DevOps, IaC & Automation",
+      "image": "assets/img/devops.svg",
+      "tags": ["Azure DevOps", "GitHub Actions", "Terraform", "Bicep", "ARM", "Docker", "Kubernetes", "PowerShell", "n8n"],
+      "bullets": [
+        "CI/CD pipelines in Azure DevOps that cut deployment times and keep integration consistent.",
+        "Infrastructure provisioning automated with Terraform, Bicep and PowerShell, removing manual error.",
+        "Containerised workloads with Docker and Kubernetes, plus workflow automation with n8n and Power Automate.",
+        "Sprint planning and delivery tracking in Azure DevOps across distributed teams."
+      ]
+    },
+    {
+      "id": "skill-security",
+      "title": "Cloud Security & Monitoring",
+      "image": "assets/img/security.svg",
+      "tags": ["Microsoft Sentinel", "Defender for Cloud", "Key Vault", "Azure Monitor", "IAM / RBAC", "Prometheus", "Datadog", "OpenSearch"],
+      "bullets": [
+        "Microsoft Sentinel deployments with data connectors, analytics rules, workbooks and automation playbooks.",
+        "Enterprise cloud security controls, risk assessments and compliance alignment (ISO/IEC 27001 & 42001 Lead Auditor).",
+        "Key management policies with Azure Key Vault, IAM roles and MFA enforcement.",
+        "Observability with Log Analytics, Azure Monitor, Prometheus and Datadog for reliability and reduced downtime."
+      ]
+    },
+    {
+      "id": "skill-data",
+      "title": "Data, AI & Development",
+      "image": "assets/img/data.svg",
+      "tags": ["Python", "JavaScript", "React", "Node.js", "SQL", "ETL", "Kubeflow", "Azure AI Services"],
+      "bullets": [
+        "ETL and data pipeline development that feeds analytics and business intelligence.",
+        "Data cleaning, exploration and regression modelling in Python for decision support.",
+        "Kubeflow pipeline components built and connected to automate data processing workflows.",
+        "Web applications in JavaScript, React, Node.js and Python with SQL and Oracle backends."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-msc",
+      "degree": "MSc Computer Science",
+      "school": "University of Ghana",
+      "period": "Oct 2025 - Sept 2026",
+      "badge": "UG",
+      "bullets": [
+        "Advanced study in software engineering, distributed systems and applied machine learning.",
+        "Extending hands-on cloud and data engineering practice with formal computer science theory."
+      ]
+    },
+    {
+      "id": "edu-bsc",
+      "degree": "BSc Geological Engineering",
+      "school": "Kwame Nkrumah University of Science and Technology (KNUST)",
+      "period": "Aug 2015 - July 2019",
+      "badge": "KN",
+      "bullets": [
+        "Engineering fundamentals in modelling, data interpretation and quantitative analysis.",
+        "Applied during national service at GNPC through basin, source rock and reservoir modelling."
+      ]
+    }
+  ],
+  "extras": [
+    {"id": "extra-awscb", "title": "AWS Community Builder", "body": "Recognised by Amazon Web Services for contributing to the AWS community through knowledge sharing, technical content and peer engagement.", "link_label": "", "link_url": ""},
+    {"id": "extra-ivy", "title": "Open Source - IVY ML Framework", "body": "Contributed issues and pull requests to IVY, a framework-agnostic ML library that unifies call signatures across TensorFlow, PyTorch and other backends.", "link_label": "", "link_url": ""},
+    {"id": "extra-powerapps", "title": "Power Apps Africa Challenge", "body": "Finished in the top 5% of the 2022 Power Apps Africa Challenge.", "link_label": "", "link_url": ""},
+    {"id": "extra-writing", "title": "Technical Writing", "body": "Publishing on Medium and Dev.to about cloud engineering, Azure, DevOps practices and data engineering.", "link_label": "Read on Medium", "link_url": "https://medium.com/@niiyarteygidiglo"},
+    {"id": "extra-fairness", "title": "Fairness in Machine Learning", "body": "Workshop attendee - MIT D-Lab & USAID, hosted at Ashesi University, Ghana (August 2019).", "link_label": "", "link_url": ""},
+    {"id": "extra-training", "title": "Certification Training Delivery", "body": "Designed curricula and delivered instructor-led AZ-305, AZ-104, AZ-500 and AZ-900 courses, upskilling 70+ IT professionals.", "link_label": "", "link_url": ""}
+  ],
+  "experience": [
+    {
+      "id": "exp-cloudware",
+      "role": "Cloud Infrastructure Engineer",
+      "org": "Cloudware Africa (Microsoft Gold Partner) · Accra, Ghana",
+      "period": "May 2023 - Present",
+      "group": "Cloud Engineering",
+      "bullets": [
+        "Conducted cloud adoption assessments using Microsoft's Cloud Adoption Framework, guiding clients through structured migration and deployment phases.",
+        "Migrated customer workloads to Azure PaaS and IaaS - on-premises servers, VMware/Hyper-V environments and web services from AWS - reducing infrastructure and operational costs.",
+        "Deployed Microsoft Sentinel and advanced security solutions with data connectors, alerts, automation rules, workbooks and custom analytics rules tailored to client use cases.",
+        "Designed fault-tolerant architectures across App Service, Azure Functions, Azure VMs and Azure Site Recovery for high availability and business continuity.",
+        "Built and maintained CI/CD pipelines in Azure DevOps, reducing deployment times and improving integration consistency.",
+        "Automated provisioning with Terraform, Bicep and PowerShell, minimising manual error and accelerating delivery.",
+        "Configured Site-to-Site VPN hybrid connectivity, Azure File Sync with lifecycle policies, and IAM roles with MFA.",
+        "Monitored infrastructure with Log Analytics and Azure Monitor, improving reliability and reducing downtime.",
+        "Developed technical proposals, presentations and product demos that turned business requirements into cloud solutions, increasing project approval rates."
+      ]
+    },
+    {
+      "id": "exp-reliance",
+      "role": "Cloud Infrastructure Engineer",
+      "org": "Reliance Infosystems Limited (Microsoft Gold Partner) · Remote",
+      "period": "May 2023 - Present",
+      "group": "Cloud Engineering",
+      "bullets": [
+        "Implemented cloud security infrastructure and secure architectures for in-house Azure applications, improving security posture and compliance adherence.",
+        "Conducted comprehensive cloud security risk assessments, identifying vulnerabilities and recommending mitigations.",
+        "Deployed Microsoft Sentinel, Azure Arc and Azure Monitor to improve threat detection, monitoring and operational visibility.",
+        "Defined and enforced enterprise-level cloud security controls aligned to industry standards.",
+        "Configured Azure Key Vault and key management policies to strengthen data security and regulatory compliance.",
+        "Implemented BCDR solutions for mission-critical workloads, ensuring data availability and minimising downtime.",
+        "Automated Azure deployments with Bicep, ARM templates and Terraform.",
+        "Translated high-level customer requirements into detailed technical specifications and solution designs."
+      ]
+    },
+    {
+      "id": "exp-freelance",
+      "role": "Cloud Engineer & Web Developer (Freelance)",
+      "org": "Fiverr & Upwork · Remote",
+      "period": "Sept 2020 - Present",
+      "group": "Cloud Engineering",
+      "bullets": [
+        "Designed and deployed cloud solutions on Azure and AWS - secure, scalable and cost-optimised environments for diverse client projects.",
+        "Developed and customised websites and web applications in JavaScript, Python and WordPress with SQL and Oracle backends.",
+        "Implemented automation and deployment pipelines to streamline application delivery."
+      ]
+    },
+    {
+      "id": "exp-invisible",
+      "role": "Advanced AI Data Trainer",
+      "org": "Invisible Technologies · Remote (United States)",
+      "period": "Sept 2024 - Present",
+      "group": "Data & AI",
+      "bullets": [
+        "Trained AI models on curated datasets including image captioning and data labelling, aligning models to specific task objectives.",
+        "Ran quality evaluation on model outputs, identifying errors and inconsistencies so performance benchmarks were consistently met."
+      ]
+    },
+    {
+      "id": "exp-hamoye",
+      "role": "Data Engineer",
+      "org": "Hamoye · Remote",
+      "period": "July 2022 - Nov 2022",
+      "group": "Data & AI",
+      "bullets": [
+        "Cleaned and explored public utility datasets in Python, delivering summary statistics and visualisations that informed decision-making.",
+        "Developed a regression model analysing eight input variables against two outputs, improving predictive accuracy.",
+        "Built and connected Kubeflow pipeline components, automating workflows and reducing data processing time."
+      ]
+    },
+    {
+      "id": "exp-techbit",
+      "role": "Software Engineer & Social Media Manager",
+      "org": "Techbit Inc (Techpreneur Magazine) · Accra, Ghana",
+      "period": "Mar 2019 - Aug 2019",
+      "group": "Earlier Roles",
+      "bullets": [
+        "Developed websites, web applications and software products in JavaScript, Python and Java with Oracle and SQL databases.",
+        "Conceptualised and executed social content strategies, increasing audience engagement and brand visibility.",
+        "Managed distribution plans and schedules aligned to marketing objectives."
+      ]
+    },
+    {
+      "id": "exp-gnpc",
+      "role": "Petroleum Geologist (National Service)",
+      "org": "Ghana National Petroleum Corporation (GNPC) · Tema, Ghana",
+      "period": "Sept 2019 - Aug 2020",
+      "group": "Earlier Roles",
+      "bullets": [
+        "Interpreted geological and geophysical data to create subsurface maps, improving exploration planning accuracy.",
+        "Conducted basin, source rock and reservoir modelling to support strategic exploration decisions."
+      ]
+    }
+  ],
+  "projects": [
+    {"id": "prj-sentinel", "title": "Enterprise SIEM Deployment - Microsoft Sentinel", "meta": "Microsoft Sentinel · Defender for Cloud · KQL · Logic Apps", "body": "Led end-to-end Sentinel deployments for 20+ enterprise clients in financial services, telecoms and energy: data connector integration, custom analytics rules, automation playbooks, syslog forwarding and Cisco Firepower log ingestion.\n\nRan POC-to-production rollouts with SOC data walkthroughs, Defender for Cloud onboarding and hands-on training for client security teams - improving threat detection visibility and reducing MTTR."},
+    {"id": "prj-migration", "title": "Cloud Migration Programme - On-Prem, OCI, AWS & GCP to Azure", "meta": "Azure Migrate · Site Recovery · IaaS/PaaS · BCDR", "body": "Planned and delivered 50+ migration projects for banking, insurance, energy, government and financial services clients, covering architecture design, migration assessments, server deployment, subscription-to-subscription moves, quota management and BCDR.\n\nPost-migration cost optimisation reduced client infrastructure costs by up to 30% while improving system availability."},
+    {"id": "prj-platform", "title": "Multi-Application Cloud Platform Setup", "meta": "App Service · NSG · Defender for Cloud · Cost Management", "body": "Architected and deployed Dev, UAT and Production environments on Azure for a major telecommunications provider, supporting consumer-facing applications with end-to-end provisioning, environment testing and cost analysis across all subscriptions.\n\nOngoing vulnerability remediation, Defender for Cloud reporting and NSG hardening produced a measurable uplift in the client's Azure Secure Score."},
+    {"id": "prj-fortigate", "title": "Automated Threat Response Pipeline - FortiGate + Sentinel", "meta": "Logic Apps · FortiGate REST API · SOAR", "body": "Designed and implemented an automated IP blocking pipeline integrating FortiGate firewalls with Microsoft Sentinel through Logic Apps and the FortiGate REST API.\n\nEnabled real-time automated threat response and eliminated manual intervention for blocking malicious IP addresses."},
+    {"id": "prj-landingzone", "title": "Azure Landing Zone & ExpressRoute Assessment", "meta": "Landing Zones · ExpressRoute · CAF · Governance", "body": "Conducted landing zone assessments for enterprise banking clients, evaluating subscription architecture, ExpressRoute connectivity, network topology and governance readiness against Microsoft's Cloud Adoption Framework.\n\nAccelerated cloud-readiness timelines and secured project approvals."},
+    {"id": "prj-sap", "title": "SAP on Azure Architecture & Specialisation Audit", "meta": "SAP on Azure · Linux HA · AZ-120", "body": "Designed SAP on Azure architectures including Content Server High Availability on Linux, and contributed to a successful Microsoft Advanced Specialisation audit for SAP on Azure.\n\nStrengthened the organisation's partner credentials and unlocked new revenue opportunities."},
+    {"id": "prj-acs", "title": "Azure Communication Services Deployment", "meta": "Azure Communication Services · SMTP · REST API", "body": "Architected and deployed Azure Communication Services for a telecoms client with both SMTP and API-based email delivery, technical documentation and sending-limit escalation resolution.\n\nLet the client consolidate messaging infrastructure and cut third-party email service costs."},
+    {"id": "prj-provisioning", "title": "SuccessFactors to Active Directory Provisioning Alerts", "meta": "Logic Apps · Log Analytics · KQL · Entra ID", "body": "Built a Logic Apps alerting pipeline that queries AAD Provisioning Logs in a Sentinel Log Analytics Workspace, formatting and emailing provisioning failure alerts to HR and IT stakeholders.\n\nCut provisioning issue resolution time from days to hours."},
+    {"id": "prj-copilot", "title": "Security Copilot Workshops & Enablement", "meta": "Security Copilot · Enablement · Pre-sales", "body": "Facilitated Microsoft Security Copilot workshops and demos for 8+ banking, insurance and telecoms clients across West and Southern Africa.\n\nDrove early adoption of AI-powered security operations and generated new consulting pipeline."},
+    {"id": "prj-cost", "title": "Azure Cost Optimisation & Consumption Reporting", "meta": "Cost Management · Reserved Instances · Rightsizing", "body": "Delivered recurring Azure consumption reports and cost optimisation assessments across multiple enterprise clients, identifying Reserved Instance savings, rightsizing opportunities and decommissioning actions.\n\nReduced monthly Azure spend by up to 25% across client portfolios."},
+    {"id": "prj-training", "title": "Azure Certification Training Delivery", "meta": "AZ-305 · AZ-104 · AZ-500 · AZ-900", "body": "Designed curricula and delivered instructor-led AZ-305, AZ-104, AZ-500 and AZ-900 courses for enterprise clients in banking, energy and financial services, including hands-on labs.\n\nUpskilled 70+ IT professionals and strengthened client cloud capability."},
+    {"id": "prj-ivy", "title": "Open Source - IVY ML Framework", "meta": "Open source · Machine learning", "body": "Contributed issues and pull requests to IVY, a framework-agnostic machine learning library that abstracts TensorFlow, PyTorch and other backends behind consistent call signatures."}
+  ],
+  "repos": [
+    {"id": "repo-cloudarch", "name": "Cloud-Engineering-and-Architecture-Projects", "url": "https://github.com/Qwamzz/Cloud-Engineering-and-Architecture-Projects", "lang": "Architecture", "description": "Reference architectures, landing zone patterns and cloud design work from migration and platform engagements."},
+    {"id": "repo-azure", "name": "Microsoft-Azure-Projects", "url": "https://github.com/Qwamzz/Microsoft-Azure-Projects", "lang": "Azure", "description": "Azure platform work - architecture, infrastructure-as-code and platform automation samples drawn from day-to-day delivery."},
+    {"id": "repo-devops", "name": "DevOps-Projects", "url": "https://github.com/Qwamzz/DevOps-Projects", "lang": "Python", "description": "Event-driven and data-pipeline builds: an NBA game day alerts system, a sports data lake and a weather data collection service."},
+    {"id": "repo-aws", "name": "AWS-Projects", "url": "https://github.com/Qwamzz/AWS-Projects", "lang": "AWS", "description": "AWS service builds, including a conversational chatbot assembled with Amazon Lex."},
+    {"id": "repo-ml", "name": "Machine-Learning-Projects", "url": "https://github.com/Qwamzz/Machine-Learning-Projects", "lang": "Jupyter Notebook", "description": "Applied ML notebooks: a spoken digit audio classifier, heart disease prediction and named entity recognition."},
+    {"id": "repo-dl", "name": "Deep-learning-Projects", "url": "https://github.com/Qwamzz/Deep-learning-Projects", "lang": "Deep Learning", "description": "Neural network experiments and training runs across vision, audio and sequence models."},
+    {"id": "repo-cv", "name": "Computer-Vision-Projects", "url": "https://github.com/Qwamzz/Computer-Vision-Projects", "lang": "Computer Vision", "description": "Image and video work - detection, classification and image processing pipelines."},
+    {"id": "repo-ai", "name": "Artificial-Intelligence-Projects", "url": "https://github.com/Qwamzz/Artificial-Intelligence-Projects", "lang": "TypeScript", "description": "Applied AI apps, including Dreamy - a generative image tool built on a TypeScript front end."},
+    {"id": "repo-data", "name": "Data-Science-and-Engineering", "url": "https://github.com/Qwamzz/Data-Science-and-Engineering", "lang": "Jupyter Notebook", "description": "Analysis and pipeline notebooks, including an exploration of Amazon bestselling book data."},
+    {"id": "repo-automation", "name": "Automation-Projects", "url": "https://github.com/Qwamzz/Automation-Projects", "lang": "n8n", "description": "Workflow automation, including an n8n pipeline that qualifies and routes inbound leads."},
+    {"id": "repo-networking", "name": "Networking-Projects", "url": "https://github.com/Qwamzz/Networking-Projects", "lang": "Networking", "description": "Network design and simulation work, including a campus network topology and a hotel management network build."}
+  ],
+  "writing": [
+    {"id": "writing-medium", "title": "Medium", "body": "Long-form technical articles on cloud engineering, Azure architecture, DevOps and data engineering.", "link_label": "medium.com/@niiyarteygidiglo", "link_url": "https://medium.com/@niiyarteygidiglo"},
+    {"id": "writing-devto", "title": "Dev.to", "body": "Practical posts covering cloud infrastructure, DevOps practices and software engineering.", "link_label": "dev.to/yartey", "link_url": "https://dev.to/yartey"}
+  ],
+  "recognition": [
+    {"id": "rec-awscb", "title": "AWS Community Builder", "body": "Recognised by Amazon Web Services for knowledge sharing, technical content and peer engagement in the AWS community."},
+    {"id": "rec-oss", "title": "Open Source Contributor", "body": "Issues and pull requests contributed to the IVY framework-agnostic machine learning library."},
+    {"id": "rec-powerapps", "title": "Power Apps Africa Challenge", "body": "Top 5% finish in the 2022 edition."}
+  ],
+  "contact": [
+    {
+      "id": "contact",
+      "lede": "Available for cloud migration, security operations, DevOps and data engineering work. The quickest route is email or LinkedIn - I usually reply within 24 hours.",
+      "email": "niiyarteygidiglo@gmail.com",
+      "phone": "+233 26 859 9753",
+      "phone_link": "tel:+233268599753",
+      "location": "Accra, Ghana"
+    }
+  ],
+  "services": [
+    {"id": "svc-migration", "title": "Cloud Migration", "body": "Assessment, architecture and delivery for moves to Azure from on-premises, AWS, GCP or OCI - including BCDR and post-migration cost optimisation."},
+    {"id": "svc-secops", "title": "Security Operations", "body": "Microsoft Sentinel deployment, Defender for Cloud onboarding, analytics rules, automation playbooks and SOC enablement."},
+    {"id": "svc-devops", "title": "DevOps & IaC", "body": "CI/CD pipelines in Azure DevOps or GitHub Actions, with infrastructure defined in Terraform, Bicep or ARM templates."},
+    {"id": "svc-data", "title": "Data Engineering", "body": "ETL pipelines, data cleaning and modelling in Python, and analytics workflows that feed business intelligence."},
+    {"id": "svc-training", "title": "Training & Enablement", "body": "Instructor-led AZ-305, AZ-104, AZ-500 and AZ-900 courses with hands-on labs for enterprise teams."},
+    {"id": "svc-web", "title": "Web Development", "body": "Websites and web applications in JavaScript, React, Node.js and Python, deployed and automated on the cloud."}
+  ]
+}
