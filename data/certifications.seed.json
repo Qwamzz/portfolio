@@ -1,0 +1,22 @@
+[
+  {"id": "az-305", "code": "AZ-305", "name": "Azure Solutions Architect Expert", "issuer": "Microsoft", "category": "Microsoft", "note": "Expert level"},
+  {"id": "az-400", "code": "AZ-400", "name": "DevOps Engineer Expert", "issuer": "Microsoft", "category": "Microsoft", "note": "Expert level"},
+  {"id": "az-500", "code": "AZ-500", "name": "Azure Security Engineer Associate", "issuer": "Microsoft", "category": "Microsoft", "note": "Associate level"},
+  {"id": "sc-200", "code": "SC-200", "name": "Security Operations Analyst Associate", "issuer": "Microsoft", "category": "Microsoft", "note": "Associate level"},
+  {"id": "az-700", "code": "AZ-700", "name": "Azure Network Engineer Associate", "issuer": "Microsoft", "category": "Microsoft", "note": "Associate level"},
+  {"id": "ai-102", "code": "AI-102", "name": "Azure AI Engineer Associate", "issuer": "Microsoft", "category": "Microsoft", "note": "Associate level"},
+  {"id": "az-120", "code": "AZ-120", "name": "Azure for SAP Workloads Specialty", "issuer": "Microsoft", "category": "Microsoft", "note": "Specialty"},
+  {"id": "az-104", "code": "AZ-104", "name": "Azure Administrator Associate", "issuer": "Microsoft", "category": "Microsoft", "note": "Associate level"},
+  {"id": "ms-900", "code": "MS-900", "name": "Microsoft 365 Certified: Fundamentals", "issuer": "Microsoft", "category": "Microsoft", "note": "Fundamentals"},
+
+  {"id": "aws-ccp", "code": "AWS", "name": "AWS Certified Cloud Practitioner", "issuer": "Amazon Web Services", "category": "Cloud & Cloud Native", "note": "Foundational"},
+  {"id": "oci-foundations", "code": "OCI", "name": "Oracle Cloud Infrastructure Certified Foundations Associate", "issuer": "Oracle", "category": "Cloud & Cloud Native", "note": "Associate"},
+  {"id": "oci-ai", "code": "OCI", "name": "Oracle Cloud Infrastructure Certified AI Foundations Associate", "issuer": "Oracle", "category": "Cloud & Cloud Native", "note": "Associate"},
+  {"id": "kcna", "code": "KCNA", "name": "Kubernetes and Cloud Native Associate", "issuer": "CNCF / Linux Foundation", "category": "Cloud & Cloud Native", "note": "Associate"},
+
+  {"id": "iso-27001", "code": "ISO", "name": "ISO/IEC 27001:2022 Lead Auditor", "issuer": "ISO", "category": "Security & Standards", "note": "Information security management systems"},
+  {"id": "iso-42001", "code": "ISO", "name": "ISO/IEC 42001:2023 Lead Auditor", "issuer": "ISO", "category": "Security & Standards", "note": "AI management systems"},
+
+  {"id": "ipmc-db", "code": "IPMC", "name": "Database Technology", "issuer": "IPMC Technology", "category": "Other", "note": "Technical training"},
+  {"id": "mimo-dev", "code": "MIMO", "name": "Python, Web Development and SQL", "issuer": "MIMO", "category": "Other", "note": "Technical training"}
+]
