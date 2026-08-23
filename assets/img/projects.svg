@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" role="img" aria-label="Projects and architecture illustration">
-  <circle cx="240" cy="170" r="145" fill="#1573c4" opacity=".08"/>
-  <rect x="60" y="50" width="360" height="240" rx="16" fill="#eaf6fd" stroke="#0d2c4b" stroke-width="4"/>
-  <rect x="60" y="50" width="360" height="34" rx="16" fill="#0d2c4b"/>
-  <g fill="#7cc4f8">
+  <circle cx="240" cy="170" r="145" fill="#7c5cff" opacity=".08"/>
+  <rect x="60" y="50" width="360" height="240" rx="16" fill="#f2f0ff" stroke="#241f4d" stroke-width="4"/>
+  <rect x="60" y="50" width="360" height="34" rx="16" fill="#241f4d"/>
+  <g fill="#19e3c0">
     <circle cx="84" cy="67" r="6"/><circle cx="104" cy="67" r="6"/><circle cx="124" cy="67" r="6"/>
   </g>
-  <g stroke="#1573c4" stroke-width="3" fill="none">
+  <g stroke="#7c5cff" stroke-width="3" fill="none">
     <path d="M240 140v30M150 200v-30h180v30M240 230v20"/>
   </g>
   <g>
-    <rect x="196" y="110" width="88" height="34" rx="8" fill="#1573c4"/>
-    <rect x="110" y="196" width="80" height="30" rx="8" fill="#0d2c4b"/>
-    <rect x="200" y="196" width="80" height="30" rx="8" fill="#0d2c4b"/>
-    <rect x="290" y="196" width="80" height="30" rx="8" fill="#0d2c4b"/>
-    <rect x="196" y="248" width="88" height="30" rx="8" fill="#57d38c"/>
+    <rect x="196" y="110" width="88" height="34" rx="8" fill="#7c5cff"/>
+    <rect x="110" y="196" width="80" height="30" rx="8" fill="#241f4d"/>
+    <rect x="200" y="196" width="80" height="30" rx="8" fill="#241f4d"/>
+    <rect x="290" y="196" width="80" height="30" rx="8" fill="#241f4d"/>
+    <rect x="196" y="248" width="88" height="30" rx="8" fill="#ffb457"/>
   </g>
 </svg>
