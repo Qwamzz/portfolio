@@ -21,7 +21,7 @@
   --aurora-2: rgba(124, 92, 255, 0.30);
   --aurora-3: rgba(255, 180, 87, 0.22);
   --grid-line: rgba(27, 23, 54, 0.045);
-  --scene-opacity: .55;
+  --scene-opacity: .34;
 }
 
 :root[data-theme="dark"] {
@@ -41,7 +41,7 @@
   --aurora-2: rgba(124, 92, 255, 0.28);
   --aurora-3: rgba(255, 180, 87, 0.14);
   --grid-line: rgba(255, 255, 255, 0.035);
-  --scene-opacity: .75;
+  --scene-opacity: .5;
 }
 
 * { box-sizing: border-box; }
@@ -100,7 +100,7 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: .85;
+  opacity: 1;
 }
 
 @keyframes drift {
@@ -228,7 +228,7 @@ a:hover { color: var(--accent); text-decoration: none; }
 
 /* ---------- Sections ---------- */
 .section { padding: 66px 0; }
-.section.alt { background: color-mix(in srgb, var(--bg-2) 62%, transparent); border-block: 1px solid var(--border); }
+.section.alt { background: color-mix(in srgb, var(--bg-2) 45%, transparent); border-block: 1px solid var(--border); }
 .section-head { text-align: center; margin-bottom: 46px; }
 .section-head h2 {
   font-size: clamp(1.85rem, 3.6vw, 2.5rem); margin: 0 0 12px;

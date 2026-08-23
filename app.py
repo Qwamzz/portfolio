@@ -385,10 +385,37 @@ def admin_page():
 # Static site
 # --------------------------------------------------------------------------
 
+_ASSET_RE = re.compile(r'(assets/(?:css|js)/[\w.-]+\.(?:css|js))"')
+
+
+def asset_version():
+    """Stamp asset URLs with a build id so a deployment never serves stale CSS or JS."""
+    newest = 0
+    for folder in ("assets/css", "assets/js"):
+        directory = os.path.join(ROOT, folder)
+        if not os.path.isdir(directory):
+            continue
+        for name in os.listdir(directory):
+            try:
+                newest = max(newest, os.path.getmtime(os.path.join(directory, name)))
+            except OSError:
+                pass
+    return str(int(newest))
+
+
 def _send(relpath):
+    if relpath.endswith(".html"):
+        with open(os.path.join(ROOT, relpath), "r", encoding="utf-8") as handle:
+            markup = handle.read()
+        markup = _ASSET_RE.sub(lambda m: m.group(1) + '?v=' + asset_version() + chr(34), markup)
+        response = Response(markup, mimetype="text/html")
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
     response = send_from_directory(ROOT, relpath)
     if relpath.startswith("assets/"):
-        response.headers["Cache-Control"] = "public, max-age=3600"
+        # Safe to cache hard: the URLs carry a version stamp.
+        response.headers["Cache-Control"] = "public, max-age=604800"
     else:
         response.headers["Cache-Control"] = "no-cache"
     return response
