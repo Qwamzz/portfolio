@@ -9,103 +9,105 @@ Target: **Linux App Service, Python 3.12**, started with
 gunicorn --bind=0.0.0.0 --timeout 600 app:app
 ```
 
-## Names used throughout
+## Current setup
 
 | Setting | Value |
 | --- | --- |
-| Resource group | `rg-yartey-portfolio` |
-| App Service plan | `asp-yartey-portfolio` (Linux, F1 free tier) |
-| Web app | `yartey-portfolio` |
-| Region | `westeurope` |
-| URL | `https://yartey-portfolio.azurewebsites.net` |
+| Web app | `portfoliosite` |
+| Runtime | Python 3.12 on Linux |
+| URL | `https://portfoliosite.azurewebsites.net` |
+| Deployment | GitHub Actions via Deployment Center |
+| Workflow | [.github/workflows/main_portfoliosite.yml](.github/workflows/main_portfoliosite.yml) |
 
-Change any of them by exporting `RESOURCE_GROUP`, `PLAN`, `APP_NAME`, `LOCATION` or `SKU`
-before running `deploy-azure.sh`. If the web app name is taken globally, pick another one and
-update `AZURE_WEBAPP_NAME` in `.github/workflows/azure-webapps.yml` to match.
+The web app was connected to this repository through the Azure portal's **Deployment Center**,
+which generated the workflow above and added the federated-credential secrets
+(`AZUREAPPSERVICE_CLIENTID_*`, `AZUREAPPSERVICE_TENANTID_*`, `AZUREAPPSERVICE_SUBSCRIPTIONID_*`)
+to the repository. Every push to `main` builds and deploys automatically - no publish profile
+or stored password involved.
 
-## Option A - provision once, then deploy on every push (recommended)
-
-1. Sign in to Azure:
-
-   ```bash
-   az login
-   ```
-
-   On a machine without a browser, use `az login --use-device-code` and complete the sign-in on
-   another device.
-
-2. Provision the infrastructure and print the publish profile:
-
-   ```bash
-   ./deploy-azure.sh provision
-   ```
-
-3. Store the publish profile as a repository secret so GitHub Actions can deploy:
-
-   ```bash
-   az webapp deployment list-publishing-profiles --name yartey-portfolio \
-     --resource-group rg-yartey-portfolio --xml | gh secret set AZURE_WEBAPP_PUBLISH_PROFILE
-   ```
-
-4. Push to `main`. The workflow installs dependencies, smoke tests every route, zips the site
-   and deploys it. Watch it with:
-
-   ```bash
-   gh run watch
-   ```
-
-## Option B - deploy straight from the command line
-
-Useful for the first deployment or when GitHub Actions is unavailable:
+Watch a deployment:
 
 ```bash
-./deploy-azure.sh
+gh run watch
 ```
 
-This provisions anything missing and then runs `az webapp up`, which zips the working
-directory, builds it with Oryx and restarts the app.
+## Required App Service configuration
 
-## Free tier note
+Two settings the deployment itself does not set:
 
-`F1` is free but limited to 60 CPU minutes per day and has no custom domain SSL. Move to `B1`
-for a production-grade portfolio:
+1. **Startup Command** (Configuration -> General settings):
 
-```bash
-az appservice plan update --name asp-yartey-portfolio \
-  --resource-group rg-yartey-portfolio --sku B1
-```
+   ```
+   gunicorn --bind=0.0.0.0 --timeout 600 app:app
+   ```
+
+2. **Application setting** (Configuration -> Application settings):
+
+   ```
+   SCM_DO_BUILD_DURING_DEPLOYMENT = 1
+   ```
+
+   Deployment Center normally adds this for you. It makes Oryx run
+   `pip install -r requirements.txt` on the platform, which is how gunicorn and Flask get
+   installed. Without it the app starts with no dependencies and returns an Application Error.
+
+Save either setting and App Service restarts the app.
 
 ## Verifying a deployment
 
 ```bash
-curl -fsS https://yartey-portfolio.azurewebsites.net/healthz
-curl -o /dev/null -s -w '%{http_code}\n' https://yartey-portfolio.azurewebsites.net/
+curl -fsS https://portfoliosite.azurewebsites.net/healthz
+curl -o /dev/null -s -w '%{http_code}\n' https://portfoliosite.azurewebsites.net/
 ```
 
-Both should return `{"status":"ok"}` and `200`. Live logs:
+Expect `{"status":"ok"}` and `200`. Live logs:
 
 ```bash
-az webapp log tail --name yartey-portfolio --resource-group rg-yartey-portfolio
+az webapp log tail --name portfoliosite --resource-group <your-resource-group>
+```
+
+## Deploying from the command line instead
+
+`deploy-azure.sh` provisions a resource group, plan and web app from scratch and deploys with
+`az webapp up`. Useful for rebuilding the infrastructure elsewhere or when GitHub Actions is
+unavailable:
+
+```bash
+az login
+APP_NAME=portfoliosite RESOURCE_GROUP=<your-resource-group> ./deploy-azure.sh
+```
+
+It also applies the startup command and app setting listed above. Override `RESOURCE_GROUP`,
+`PLAN`, `APP_NAME`, `LOCATION` or `SKU` with environment variables.
+
+## Free tier note
+
+`F1` is free but limited to 60 CPU minutes per day and cannot do custom-domain SSL. For a
+production-grade portfolio move to `B1`:
+
+```bash
+az appservice plan update --name <your-plan> --resource-group <your-resource-group> --sku B1
 ```
 
 ## Custom domain
 
 ```bash
-az webapp config hostname add --webapp-name yartey-portfolio \
-  --resource-group rg-yartey-portfolio --hostname www.example.com
-az webapp config ssl create --resource-group rg-yartey-portfolio \
-  --name yartey-portfolio --hostname www.example.com
+az webapp config hostname add --webapp-name portfoliosite \
+  --resource-group <your-resource-group> --hostname www.example.com
+az webapp config ssl create --resource-group <your-resource-group> \
+  --name portfoliosite --hostname www.example.com
 ```
 
-A managed certificate requires at least the `B1` tier and a `CNAME` record pointing at
-`yartey-portfolio.azurewebsites.net`.
+A managed certificate requires at least `B1` and a `CNAME` record pointing at
+`portfoliosite.azurewebsites.net`.
 
 ## Troubleshooting
 
 - **Application Error on first load** - the free tier cold-starts slowly; wait ~30 seconds and
-  reload. If it persists, check the startup command is set:
-  `az webapp config show --name yartey-portfolio --resource-group rg-yartey-portfolio --query linuxFxVersion,appCommandLine`.
-- **CSS or images 404** - confirm `assets/` was included in the deployment package; the
-  workflow's zip step excludes only `.git`, `.github`, `.venv` and Python caches.
-- **Deployment succeeds but the old site is served** - App Service caches aggressively at the
-  edge; `az webapp restart` clears it.
+  reload. If it persists, confirm the startup command:
+  `az webapp config show --name portfoliosite --resource-group <your-resource-group> --query "[linuxFxVersion,appCommandLine]"`.
+- **Default Azure welcome page still showing** - the first deployment has not finished, or it
+  deployed while the startup command was still empty. Re-run the workflow after setting it.
+- **CSS or images 404** - confirm `assets/` reached the web app; browse the file system under
+  `https://portfoliosite.scm.azurewebsites.net/newui/fileManager`.
+- **A deployment succeeds but the old site is served** - `az webapp restart` clears it.
