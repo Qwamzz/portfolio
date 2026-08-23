@@ -4,7 +4,7 @@ Personal portfolio site for a Cloud Infrastructure / DevOps / Data Engineer, bui
 HTML, CSS and JavaScript and served on Azure App Service (Linux, Python) by a small Flask
 static-file server.
 
-Live site: https://portfoliosite.azurewebsites.net
+Live site: https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net
 
 ## Pages
 
