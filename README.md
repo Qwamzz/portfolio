@@ -16,7 +16,7 @@ Live site: https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net
 | `projects.html` | Twelve delivery engagements with scope and outcome, ten GitHub repositories, plus writing links |
 | `certifications.html` | Microsoft, AWS, Oracle, CNCF and ISO credentials, rendered from the JSON store |
 | `admin.html` | Password-protected page for adding certifications and uploading certificate files |
-| `contact.html` | Email, phone, location, social links and areas of work |
+| `contact.html` | Email, phone, location, social links, a message form and areas of work |
 
 ## Design
 
@@ -44,6 +44,20 @@ endpoint requires that session. See [DEPLOY.md](DEPLOY.md#turning-on-the-certifi
 
 If the API is unreachable the page falls back to the static markup in `certifications.html`, so
 it never renders empty.
+
+## Contact messages
+
+The form on the contact page posts to `/api/messages` and the message is stored alongside the
+certifications. Read them in the **Messages** panel at `/admin`, where each one can be marked
+read or deleted, with a one-click mailto reply.
+
+Messages are **stored, not emailed** - nothing leaves the web app, so check `/admin` (the panel
+shows an unread count). Wiring up an email notification would mean adding SMTP or Azure
+Communication Services credentials.
+
+Spam handling: a hidden honeypot field, required-field and email-format validation, a 10 to
+4000 character range on the body, and a per-IP limit of 5 messages every 15 minutes. The store
+keeps the 500 most recent messages.
 
 ## Running locally
 
