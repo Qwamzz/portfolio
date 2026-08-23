@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" role="img" aria-label="Work experience illustration">
-  <circle cx="240" cy="170" r="140" fill="#1573c4" opacity=".08"/>
+  <circle cx="240" cy="170" r="140" fill="#7c5cff" opacity=".08"/>
   <g transform="translate(120 90)">
-    <rect y="40" width="240" height="150" rx="14" fill="#0d2c4b"/>
-    <path d="M80 40V22a18 18 0 0 1 18-18h44a18 18 0 0 1 18 18v18" fill="none" stroke="#0d2c4b" stroke-width="12"/>
-    <rect y="96" width="240" height="16" fill="#1573c4"/>
-    <rect x="100" y="88" width="40" height="32" rx="6" fill="#7cc4f8"/>
+    <rect y="40" width="240" height="150" rx="14" fill="#241f4d"/>
+    <path d="M80 40V22a18 18 0 0 1 18-18h44a18 18 0 0 1 18 18v18" fill="none" stroke="#241f4d" stroke-width="12"/>
+    <rect y="96" width="240" height="16" fill="#7c5cff"/>
+    <rect x="100" y="88" width="40" height="32" rx="6" fill="#19e3c0"/>
   </g>
-  <g fill="#7cc4f8">
+  <g fill="#19e3c0">
     <circle cx="80" cy="90" r="10"/>
     <circle cx="405" cy="240" r="13"/>
   </g>
-  <path d="M60 250h70M60 272h44" stroke="#1573c4" stroke-width="7" stroke-linecap="round" opacity=".6"/>
+  <path d="M60 250h70M60 272h44" stroke="#7c5cff" stroke-width="7" stroke-linecap="round" opacity=".6"/>
 </svg>

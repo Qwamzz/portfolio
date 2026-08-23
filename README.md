@@ -13,14 +13,19 @@ Live site: https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net
 | `index.html` | Hero, headline numbers, and the four practice areas (cloud architecture, DevOps/IaC, security, data & AI) |
 | `education.html` | Degrees plus community work, recognition and technical writing |
 | `experience.html` | Roles grouped into collapsible sections: cloud engineering, data & AI, earlier roles |
-| `projects.html` | Twelve delivery engagements with scope and outcome, plus writing links |
+| `projects.html` | Twelve delivery engagements with scope and outcome, ten GitHub repositories, plus writing links |
 | `certifications.html` | Microsoft, AWS, Oracle, CNCF and ISO credentials |
 | `contact.html` | Email, phone, location, social links and areas of work |
 
 ## Design
 
+- Palette: deep indigo ground with aurora teal (`#19e3c0`), violet (`#9a7bff`) and a warm amber
+  highlight. Both themes are defined as custom properties at the top of `style.css`.
+- An animated aurora gradient sits behind the page, overlaid with a masked grid so it reads as a
+  surface rather than a smear. Glass cards (`backdrop-filter`) sit on top of it.
 - Light and dark themes. The first visit follows the operating system preference; the toggle in
   the navigation bar overrides it and the choice is stored in `localStorage`.
+- Gradient headings, a scroll progress bar, floating illustrations and hover lift on every card.
 - Responsive down to 375px, with a collapsing navigation menu below 900px.
 - Illustrations are hand-written SVG in `assets/img/` - no external asset or font requests, so
   the site loads with no third-party dependencies.

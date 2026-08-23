@@ -57,6 +57,22 @@
       });
     });
 
+    // ---------- Scroll progress bar ----------
+    var bar = document.createElement("div");
+    bar.className = "progress";
+    document.body.appendChild(bar);
+    var ticking = false;
+    function paintProgress() {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      bar.style.width = pct + "%";
+      ticking = false;
+    }
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; window.requestAnimationFrame(paintProgress); }
+    }, { passive: true });
+    paintProgress();
+
     // ---------- Scroll reveal ----------
     var items = document.querySelectorAll(".reveal");
     if (!("IntersectionObserver" in window)) {

@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" role="img" aria-label="Data engineering and analytics illustration">
   <g transform="translate(40 60)">
-    <ellipse cx="80" cy="26" rx="80" ry="26" fill="#1573c4"/>
-    <path d="M0 26v130c0 14 36 26 80 26s80-12 80-26V26" fill="#0d2c4b"/>
-    <ellipse cx="80" cy="82" rx="80" ry="26" fill="#14507f"/>
-    <ellipse cx="80" cy="138" rx="80" ry="26" fill="#1a5f95"/>
-    <circle cx="132" cy="150" r="6" fill="#57d38c"/>
+    <ellipse cx="80" cy="26" rx="80" ry="26" fill="#7c5cff"/>
+    <path d="M0 26v130c0 14 36 26 80 26s80-12 80-26V26" fill="#241f4d"/>
+    <ellipse cx="80" cy="82" rx="80" ry="26" fill="#332b63"/>
+    <ellipse cx="80" cy="138" rx="80" ry="26" fill="#413879"/>
+    <circle cx="132" cy="150" r="6" fill="#ffb457"/>
   </g>
 
   <g transform="translate(250 70)">
-    <rect width="190" height="200" rx="14" fill="#eaf6fd" stroke="#1573c4" stroke-width="3"/>
-    <rect x="24" y="120" width="26" height="56" rx="6" fill="#7cc4f8"/>
-    <rect x="62" y="86" width="26" height="90" rx="6" fill="#4aa8ee"/>
-    <rect x="100" y="104" width="26" height="72" rx="6" fill="#1573c4"/>
-    <rect x="138" y="56" width="26" height="120" rx="6" fill="#0d2c4b"/>
-    <path d="M24 60l38 14 38-24 38-22" stroke="#57d38c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="24" y="24" width="76" height="10" rx="5" fill="#cfe9fa"/>
+    <rect width="190" height="200" rx="14" fill="#f2f0ff" stroke="#7c5cff" stroke-width="3"/>
+    <rect x="24" y="120" width="26" height="56" rx="6" fill="#19e3c0"/>
+    <rect x="62" y="86" width="26" height="90" rx="6" fill="#a08cff"/>
+    <rect x="100" y="104" width="26" height="72" rx="6" fill="#7c5cff"/>
+    <rect x="138" y="56" width="26" height="120" rx="6" fill="#241f4d"/>
+    <path d="M24 60l38 14 38-24 38-22" stroke="#ffb457" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="24" y="24" width="76" height="10" rx="5" fill="#d8d2ff"/>
   </g>
 
-  <path d="M200 160h44" stroke="#1573c4" stroke-width="5" stroke-dasharray="8 8" stroke-linecap="round"/>
+  <path d="M200 160h44" stroke="#7c5cff" stroke-width="5" stroke-dasharray="8 8" stroke-linecap="round"/>
 </svg>
