@@ -74,13 +74,89 @@
     });
   }
 
+  function renderMessages(data) {
+    var listNode = document.getElementById("messages");
+    var pill = document.getElementById("unread");
+
+    document.getElementById("msg-count").textContent = String(data.items.length);
+    pill.hidden = !data.unread;
+    pill.textContent = data.unread + " unread";
+
+    listNode.innerHTML = "";
+    if (!data.items.length) {
+      listNode.appendChild(document.createElement("li")).textContent = "No messages yet.";
+      return;
+    }
+
+    data.items.forEach(function (item) {
+      var li = document.createElement("li");
+      if (!item.read) li.className = "unread";
+
+      var body = document.createElement("div");
+
+      var head = document.createElement("strong");
+      head.textContent = item.subject || "(no subject)";
+      body.appendChild(head);
+
+      var from = document.createElement("span");
+      from.textContent = item.name + " · " + item.email + " · " + item.received;
+      body.appendChild(from);
+
+      var text = document.createElement("p");
+      text.className = "msg-body";
+      text.textContent = item.message;
+      body.appendChild(text);
+
+      var reply = document.createElement("a");
+      reply.href = "mailto:" + encodeURIComponent(item.email) +
+        "?subject=" + encodeURIComponent("Re: " + (item.subject || "your message"));
+      reply.textContent = "Reply by email";
+      body.appendChild(reply);
+
+      li.appendChild(body);
+
+      var mark = document.createElement("button");
+      mark.type = "button";
+      mark.className = "btn btn-outline";
+      mark.textContent = item.read ? "Mark unread" : "Mark read";
+      mark.addEventListener("click", function () {
+        api("/api/messages/" + encodeURIComponent(item.id), {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ read: !item.read })
+        }).then(load).catch(function (error) { say(error.message, true); });
+      });
+      li.appendChild(mark);
+
+      var remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "btn btn-outline danger";
+      remove.textContent = "Delete";
+      remove.addEventListener("click", function () {
+        if (!window.confirm("Delete this message from " + item.name + "?")) return;
+        api("/api/messages/" + encodeURIComponent(item.id), { method: "DELETE" })
+          .then(load)
+          .then(function () { say("Message deleted."); })
+          .catch(function (error) { say(error.message, true); });
+      });
+      li.appendChild(remove);
+
+      listNode.appendChild(li);
+    });
+  }
+
   function load() {
     return api("/api/certifications").then(function (data) {
       show(disabledCard, !data.adminEnabled);
       show(loginCard, data.adminEnabled && !data.admin);
       show(panel, data.admin === true);
-      if (data.admin) render(data);
-      return data;
+      if (!data.admin) return data;
+
+      render(data);
+      return api("/api/messages").then(function (messages) {
+        renderMessages(messages);
+        return data;
+      });
     });
   }
 

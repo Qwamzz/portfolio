@@ -34,7 +34,11 @@ else:
 
 UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
 CERTS_FILE = os.path.join(DATA_DIR, "certifications.json")
+MESSAGES_FILE = os.path.join(DATA_DIR, "messages.json")
 SEED_FILE = os.path.join(ROOT, "data", "certifications.seed.json")
+
+MAX_MESSAGES = 500
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$")
 
 ALLOWED_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".pdf"}
 CATEGORIES = ["Microsoft", "Cloud & Cloud Native", "Security & Standards", "Other"]
@@ -89,6 +93,24 @@ def save_certifications(items):
     with open(tmp, "w", encoding="utf-8") as handle:
         json.dump(items, handle, indent=2, ensure_ascii=False)
     os.replace(tmp, CERTS_FILE)
+
+
+def load_messages():
+    _ensure_store()
+    try:
+        with open(MESSAGES_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, list) else []
+    except (OSError, ValueError):
+        return []
+
+
+def save_messages(items):
+    _ensure_store()
+    tmp = MESSAGES_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        json.dump(items, handle, indent=2, ensure_ascii=False)
+    os.replace(tmp, MESSAGES_FILE)
 
 
 def _slug(value):
@@ -237,6 +259,87 @@ def api_delete_certification(cert_id):
                 os.remove(path)
 
     save_certifications(remaining)
+    return jsonify(ok=True)
+
+
+# --------------------------------------------------------------------------
+# Contact messages
+# --------------------------------------------------------------------------
+
+@app.route("/api/messages", methods=["POST"])
+def api_post_message():
+    payload = request.get_json(silent=True) or request.form
+
+    # Bots fill every field they find; a real visitor never sees this one.
+    if (payload.get("website") or "").strip():
+        return jsonify(ok=True), 202
+
+    name = (payload.get("name") or "").strip()
+    email = (payload.get("email") or "").strip()
+    body = (payload.get("message") or "").strip()
+
+    if not name or not email or not body:
+        return jsonify(error="Name, email and message are all required."), 400
+    if not EMAIL_RE.match(email):
+        return jsonify(error="That email address does not look right."), 400
+    if len(body) < 10:
+        return jsonify(error="Please write a little more so I can help."), 400
+    if len(body) > 4000 or len(name) > 120 or len(email) > 160:
+        return jsonify(error="That message is too long."), 400
+
+    key = "msg:" + (request.remote_addr or "unknown")
+    count, last = _failures.get(key, (0, 0.0))
+    if count >= 5 and (time.time() - last) < 900:
+        return jsonify(error="Too many messages just now. Please try again shortly."), 429
+    _failures[key] = (count + 1 if (time.time() - last) < 900 else 1, time.time())
+
+    messages = load_messages()
+    messages.insert(0, {
+        "id": uuid.uuid4().hex[:12],
+        "name": name,
+        "email": email,
+        "subject": (payload.get("subject") or "").strip()[:160],
+        "message": body,
+        "received": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        "read": False,
+    })
+    save_messages(messages[:MAX_MESSAGES])
+    return jsonify(ok=True), 201
+
+
+@app.route("/api/messages")
+def api_list_messages():
+    denied = require_admin()
+    if denied:
+        return denied
+    messages = load_messages()
+    return jsonify(items=messages, unread=sum(1 for m in messages if not m.get("read")))
+
+
+@app.route("/api/messages/<message_id>", methods=["PATCH"])
+def api_mark_message(message_id):
+    denied = require_admin()
+    if denied:
+        return denied
+    messages = load_messages()
+    for message in messages:
+        if message.get("id") == message_id:
+            message["read"] = bool((request.get_json(silent=True) or {}).get("read", True))
+            save_messages(messages)
+            return jsonify(ok=True)
+    return jsonify(error="No message with that id."), 404
+
+
+@app.route("/api/messages/<message_id>", methods=["DELETE"])
+def api_delete_message(message_id):
+    denied = require_admin()
+    if denied:
+        return denied
+    messages = load_messages()
+    remaining = [m for m in messages if m.get("id") != message_id]
+    if len(remaining) == len(messages):
+        return jsonify(error="No message with that id."), 404
+    save_messages(remaining)
     return jsonify(ok=True)
 
 

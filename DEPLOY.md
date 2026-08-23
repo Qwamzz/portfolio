@@ -79,8 +79,8 @@ Then open `https://<your-app>.azurewebsites.net/admin` and sign in.
 
 ### Where the data lives
 
-Certifications are stored as JSON at `/home/data/certifications.json`, with uploaded files in
-`/home/data/uploads/`. `/home` is the persistent volume on App Service, so **the data survives
+Certifications are stored as JSON at `/home/data/certifications.json`, contact form messages at
+`/home/data/messages.json`, and uploaded certificate files in `/home/data/uploads/`. `/home` is the persistent volume on App Service, so **the data survives
 restarts and deployments** - deployments only replace `/home/site/wwwroot`. On first run the
 file is seeded from `data/certifications.seed.json` in the repository.
 
