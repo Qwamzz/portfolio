@@ -21,6 +21,7 @@
   --aurora-2: rgba(124, 92, 255, 0.30);
   --aurora-3: rgba(255, 180, 87, 0.22);
   --grid-line: rgba(27, 23, 54, 0.045);
+  --scene-opacity: .55;
 }
 
 :root[data-theme="dark"] {
@@ -40,6 +41,7 @@
   --aurora-2: rgba(124, 92, 255, 0.28);
   --aurora-3: rgba(255, 180, 87, 0.14);
   --grid-line: rgba(255, 255, 255, 0.035);
+  --scene-opacity: .75;
 }
 
 * { box-sizing: border-box; }
@@ -72,19 +74,24 @@ body::before {
   animation: drift 26s ease-in-out infinite alternate;
 }
 
-/* Fine grid overlay so the gradients read as a surface, not a smear. */
+/* Illustrated scene plus a fine grid, so the gradients read as a surface rather than a smear. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  opacity: var(--scene-opacity);
   background-image:
+    url("../img/bg-scene.svg"),
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 78%);
-  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 78%);
+  background-size: cover, 64px 64px, 64px 64px;
+  background-position: center, 0 0, 0 0;
+  background-repeat: no-repeat, repeat, repeat;
+  background-attachment: fixed, fixed, fixed;
+  mask-image: radial-gradient(circle at 50% 34%, #000 0%, rgba(0, 0, 0, .45) 62%, transparent 88%);
+  -webkit-mask-image: radial-gradient(circle at 50% 34%, #000 0%, rgba(0, 0, 0, .45) 62%, transparent 88%);
 }
 
 @keyframes drift {
@@ -418,4 +425,70 @@ a:hover { color: var(--accent); text-decoration: none; }
   body::before, .skill-art img { animation: none; }
   html { scroll-behavior: auto; }
   .card:hover, .job:hover, .stat:hover, .edu:hover, .btn:hover, .socials a:hover { transform: none; }
+}
+
+/* ---------- Certificate links ---------- */
+.cert-links { display: flex; gap: 14px; margin-top: 6px; }
+.cert-links a { font-size: .82rem; font-weight: 600; color: var(--accent); }
+.cert-links a:hover { text-decoration: underline; }
+
+/* ---------- Contact panel ---------- */
+.contact-card {
+  padding: 34px 32px;
+  border-radius: calc(var(--radius) + 4px);
+}
+.contact-card::before { transform: scaleX(1); }
+.contact-card h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 14px;
+  background: linear-gradient(120deg, var(--text) 30%, var(--accent-2) 75%, var(--accent) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.contact-card .lede { color: var(--text-soft); font-size: 1.03rem; margin: 0 0 26px; }
+.contact-list li { color: var(--text); }
+.contact-list a { color: var(--text); font-weight: 500; }
+.contact-list a:hover { color: var(--accent); }
+
+/* ---------- Admin ---------- */
+.admin-wrap { max-width: 860px; }
+.admin-wrap .card { margin-bottom: 24px; }
+.admin-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.admin-head h3 { margin: 0; }
+.admin-form { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; }
+.admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.admin-form label {
+  display: flex; flex-direction: column; gap: 7px;
+  font-size: .86rem; font-weight: 600; color: var(--text-soft);
+}
+.admin-form .req { display: none; }
+.admin-form input, .admin-form select {
+  font-family: inherit; font-size: .95rem; font-weight: 400;
+  padding: 11px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface-solid); color: var(--text);
+}
+.admin-form input:focus, .admin-form select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow);
+}
+.admin-form input[type="file"] { padding: 9px; }
+.admin-form button { align-self: flex-start; }
+
+.admin-list { list-style: none; padding: 0; margin: 18px 0 0; }
+.admin-list li {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.admin-list li:last-child { border-bottom: 0; }
+.admin-list li > div { flex: 1; min-width: 240px; display: flex; flex-direction: column; }
+.admin-list strong { font-size: .97rem; }
+.admin-list span { font-size: .82rem; color: var(--text-soft); }
+.admin-list a { font-size: .8rem; }
+.admin-list .btn { padding: 8px 16px; font-size: .84rem; }
+.danger:hover { border-color: #e2557a; color: #e2557a; box-shadow: 0 8px 22px rgba(226, 85, 122, .22); }
+
+.admin-msg { margin: 0; font-size: .92rem; min-height: 1.4em; }
+.admin-msg.ok { color: var(--accent); }
+.admin-msg.error { color: #e2557a; }
+
+@media (max-width: 620px) {
+  .admin-grid { grid-template-columns: 1fr; }
 }

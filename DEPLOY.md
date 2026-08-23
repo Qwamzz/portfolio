@@ -53,6 +53,46 @@ Two settings the deployment itself does not set:
 
 Save either setting and App Service restarts the app.
 
+## Turning on the certifications admin
+
+`/admin` lets you add and delete certifications - including uploading the certificate file -
+without editing code or redeploying. It stays switched off until a password is configured.
+
+Under **Configuration -> Application settings** add:
+
+| Name | Value |
+| --- | --- |
+| `ADMIN_PASSWORD` | a password you choose - this is the only thing protecting the admin page |
+| `SECRET_KEY` | any long random string; it signs the session cookie |
+
+Pick a strong, unique password and store it in a password manager. Without `ADMIN_PASSWORD`
+the admin page shows "Admin is switched off" and every write endpoint returns 503, so the
+public site is never editable by accident.
+
+To generate a `SECRET_KEY`:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Then open `https://<your-app>.azurewebsites.net/admin` and sign in.
+
+### Where the data lives
+
+Certifications are stored as JSON at `/home/data/certifications.json`, with uploaded files in
+`/home/data/uploads/`. `/home` is the persistent volume on App Service, so **the data survives
+restarts and deployments** - deployments only replace `/home/site/wwwroot`. On first run the
+file is seeded from `data/certifications.seed.json` in the repository.
+
+Back it up or inspect it any time:
+
+```bash
+az webapp ssh --name portfoliosite --resource-group <your-resource-group>
+cat /home/data/certifications.json
+```
+
+Locally the same data goes to `data/store/`, which is git-ignored.
+
 ## Verifying a deployment
 
 ```bash

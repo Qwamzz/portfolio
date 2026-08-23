@@ -14,7 +14,8 @@ Live site: https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net
 | `education.html` | Degrees plus community work, recognition and technical writing |
 | `experience.html` | Roles grouped into collapsible sections: cloud engineering, data & AI, earlier roles |
 | `projects.html` | Twelve delivery engagements with scope and outcome, ten GitHub repositories, plus writing links |
-| `certifications.html` | Microsoft, AWS, Oracle, CNCF and ISO credentials |
+| `certifications.html` | Microsoft, AWS, Oracle, CNCF and ISO credentials, rendered from the JSON store |
+| `admin.html` | Password-protected page for adding certifications and uploading certificate files |
 | `contact.html` | Email, phone, location, social links and areas of work |
 
 ## Design
@@ -30,6 +31,19 @@ Live site: https://portfoliosite-fuedesckb9cxe3cf.uksouth-01.azurewebsites.net
 - Illustrations are hand-written SVG in `assets/img/` - no external asset or font requests, so
   the site loads with no third-party dependencies.
 - Scroll-reveal animations respect `prefers-reduced-motion`.
+
+## Managing certifications
+
+The certifications page reads from `/api/certifications`, which is backed by a JSON file on the
+web app's persistent volume. Sign in at `/admin` to add an entry - name, code, issuer, category,
+note, credential link and an optional certificate file (PNG, JPG, WEBP, GIF or PDF up to 8 MB) -
+or to delete one. Changes are live immediately; no redeploy.
+
+The admin area is disabled until `ADMIN_PASSWORD` is set on the web app, and every write
+endpoint requires that session. See [DEPLOY.md](DEPLOY.md#turning-on-the-certifications-admin).
+
+If the API is unreachable the page falls back to the static markup in `certifications.html`, so
+it never renders empty.
 
 ## Running locally
 
