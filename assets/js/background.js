@@ -77,9 +77,9 @@
   }
 
   function build() {
-    var scale = Math.min(width, height) * (width < 760 ? 0.42 : 0.34);
-    var knot = buildKnot(width < 760 ? 130 : 220, scale);
-    var shell = buildShell(width < 760 ? 60 : 120, scale * 1.5);
+    var scale = Math.min(width, height) * (width < 760 ? 0.5 : 0.46);
+    var knot = buildKnot(width < 760 ? 150 : 260, scale);
+    var shell = buildShell(width < 760 ? 70 : 150, scale * 1.45);
     points = knot.concat(shell);
 
     // Link consecutive ribbon points so the knot draws as a continuous strand.
@@ -112,8 +112,10 @@
     z = point.y * sinX + z * cosX;
 
     var depth = FOCAL / (FOCAL + z + 460);
+    // On wide screens the form sits right of centre, clear of the headline column.
+    var originX = width > 900 ? width * 0.63 : width * 0.5;
     return {
-      x: width / 2 + x * depth + pointer.x,
+      x: originX + x * depth + pointer.x,
       y: height / 2 + y * depth + pointer.y,
       depth: depth,
       z: z
@@ -133,14 +135,14 @@
     var projected = points.map(project);
 
     // Strand first, so particles sit on top of it.
-    ctx.lineWidth = 1.15;
+    ctx.lineWidth = 1.8;
     for (var l = 0; l < links.length; l++) {
       var a = projected[links[l][0]];
       var b = projected[links[l][1]];
       var span = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-      if (span > 260) continue;
+      if (span > 320) continue;
       var strength = Math.max(0, Math.min(1, (a.depth - 0.42) * 1.9));
-      ctx.strokeStyle = rgba(palette.a, 0.05 + strength * 0.34);
+      ctx.strokeStyle = rgba(palette.a, 0.12 + strength * 0.62);
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
@@ -158,15 +160,15 @@
       var fade = Math.max(0, Math.min(1, (proj.depth - 0.4) * 1.8));
       if (fade <= 0.02) continue;
 
-      var radius = source.size * proj.depth * 1.9;
-      ctx.fillStyle = rgba(palette[source.colour], 0.14 + fade * 0.7);
+      var radius = source.size * proj.depth * 2.3;
+      ctx.fillStyle = rgba(palette[source.colour], 0.22 + fade * 0.74);
       ctx.beginPath();
       ctx.arc(proj.x, proj.y, radius, 0, Math.PI * 2);
       ctx.fill();
 
       // A soft halo on the nearest particles for a little bloom.
-      if (fade > 0.82 && source.colour !== "a") {
-        ctx.fillStyle = rgba(palette[source.colour], 0.07);
+      if (fade > 0.7 && source.colour !== "a") {
+        ctx.fillStyle = rgba(palette[source.colour], 0.1);
         ctx.beginPath();
         ctx.arc(proj.x, proj.y, radius * 3.4, 0, Math.PI * 2);
         ctx.fill();
