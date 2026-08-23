@@ -17,11 +17,9 @@
   --radius: 18px;
   --maxw: 1180px;
   --nav-h: 76px;
-  --aurora-1: rgba(25, 227, 192, 0.30);
-  --aurora-2: rgba(124, 92, 255, 0.30);
-  --aurora-3: rgba(255, 180, 87, 0.22);
-  --grid-line: rgba(27, 23, 54, 0.045);
-  --scene-opacity: .34;
+  --blob-opacity: .55;
+  --blob-opacity-2: .45;
+  --grain-opacity: .16;
 }
 
 :root[data-theme="dark"] {
@@ -37,11 +35,9 @@
   --glow: rgba(25, 227, 192, 0.22);
   --border: rgba(255, 255, 255, 0.11);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  --aurora-1: rgba(25, 227, 192, 0.22);
-  --aurora-2: rgba(124, 92, 255, 0.28);
-  --aurora-3: rgba(255, 180, 87, 0.14);
-  --grid-line: rgba(255, 255, 255, 0.035);
-  --scene-opacity: .5;
+  --blob-opacity: .42;
+  --blob-opacity-2: .34;
+  --grain-opacity: .10;
 }
 
 * { box-sizing: border-box; }
@@ -59,54 +55,86 @@ body {
   transition: background .3s ease, color .3s ease;
 }
 
-/* ---------- Animated aurora background ---------- */
-body::before {
-  content: "";
-  position: fixed;
-  inset: -25%;
-  z-index: -3;
-  background:
-    radial-gradient(38% 42% at 18% 22%, var(--aurora-1) 0%, transparent 62%),
-    radial-gradient(42% 46% at 82% 18%, var(--aurora-2) 0%, transparent 64%),
-    radial-gradient(46% 44% at 68% 82%, var(--aurora-3) 0%, transparent 66%),
-    radial-gradient(40% 40% at 12% 78%, var(--aurora-2) 0%, transparent 62%);
-  filter: blur(18px);
-  animation: drift 26s ease-in-out infinite alternate;
-}
-
-/* Illustrated scene plus a fine grid, so the gradients read as a surface rather than a smear. */
+/* ---------- Sculpted background forms ----------
+   Four soft, lit volumes that morph and drift very slowly behind the page.
+   Pure CSS, so there is nothing to run and nothing to keep repainting. */
+html::before,
+html::after,
+body::before,
 body::after {
   content: "";
   position: fixed;
-  inset: 0;
-  z-index: -2;
   pointer-events: none;
-  opacity: var(--scene-opacity);
-  background-image:
-    url("../img/bg-scene.svg"),
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: cover, 64px 64px, 64px 64px;
-  background-position: center, 0 0, 0 0;
-  background-repeat: no-repeat, repeat, repeat;
-  background-attachment: fixed, fixed, fixed;
-  mask-image: radial-gradient(circle at 50% 34%, #000 0%, rgba(0, 0, 0, .45) 62%, transparent 88%);
-  -webkit-mask-image: radial-gradient(circle at 50% 34%, #000 0%, rgba(0, 0, 0, .45) 62%, transparent 88%);
 }
 
-/* ---------- Motion background canvas ---------- */
-.bg-canvas {
-  position: fixed;
+/* Base wash, so the page never sits on flat colour. */
+html::before {
+  inset: 0;
+  z-index: -4;
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--accent) 12%, var(--bg)) 0%,
+      var(--bg) 42%,
+      color-mix(in srgb, var(--accent-2) 14%, var(--bg)) 100%);
+}
+
+/* Two large forms, upper left and right. */
+body::before {
+  inset: -20% -10% auto -20%;
+  height: 115vh;
+  z-index: -3;
+  background:
+    radial-gradient(42% 44% at 34% 32%,
+      color-mix(in srgb, var(--accent) 78%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 26%, transparent) 46%,
+      transparent 72%),
+    radial-gradient(38% 42% at 78% 24%,
+      color-mix(in srgb, var(--accent-2) 82%, transparent) 0%,
+      color-mix(in srgb, var(--accent-2) 24%, transparent) 48%,
+      transparent 74%);
+  filter: blur(48px) saturate(125%);
+  opacity: var(--blob-opacity);
+  animation: morph-a 78s ease-in-out infinite alternate;
+}
+
+/* Two more low and to the right, so the composition has depth front to back. */
+body::after {
+  inset: auto -15% -25% -5%;
+  height: 105vh;
+  z-index: -2;
+  background:
+    radial-gradient(40% 44% at 70% 62%,
+      color-mix(in srgb, var(--accent-2) 74%, transparent) 0%,
+      color-mix(in srgb, var(--accent-2) 22%, transparent) 46%,
+      transparent 72%),
+    radial-gradient(34% 38% at 26% 74%,
+      color-mix(in srgb, var(--accent-3) 62%, transparent) 0%,
+      color-mix(in srgb, var(--accent-3) 18%, transparent) 44%,
+      transparent 70%);
+  filter: blur(56px) saturate(120%);
+  opacity: var(--blob-opacity-2);
+  animation: morph-b 96s ease-in-out infinite alternate;
+}
+
+/* Fine grain over everything, which is what stops large gradients from banding. */
+html::after {
   inset: 0;
   z-index: -1;
-  pointer-events: none;
-  opacity: 1;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-@keyframes drift {
+@keyframes morph-a {
   0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(3%, -2.5%, 0) scale(1.08); }
-  100% { transform: translate3d(-2.5%, 2%, 0) scale(1.04); }
+  50%  { transform: translate3d(2.5%, 1.5%, 0) scale(1.09); }
+  100% { transform: translate3d(-1.5%, 2.5%, 0) scale(1.04); }
+}
+
+@keyframes morph-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1.04); }
+  50%  { transform: translate3d(-3%, -1.5%, 0) scale(1); }
+  100% { transform: translate3d(1.5%, -2.5%, 0) scale(1.08); }
 }
 
 @keyframes float {
@@ -431,7 +459,7 @@ a:hover { color: var(--accent); text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  body::before, .skill-art img { animation: none; }
+  body::before, body::after, .skill-art img { animation: none; }
   html { scroll-behavior: auto; }
   .card:hover, .job:hover, .stat:hover, .edu:hover, .btn:hover, .socials a:hover { transform: none; }
 }
