@@ -7,7 +7,7 @@
   --surface: rgba(255, 255, 255, 0.72);
   --surface-solid: #ffffff;
   --text: #1b1736;
-  --text-soft: #565080;
+  --text-soft: #4b4675;
   --accent: #0a7a68;
   --on-accent: #ffffff;
   --accent-2: #6b46f0;
@@ -18,10 +18,10 @@
   --radius: 18px;
   --maxw: 1180px;
   --nav-h: 76px;
-  --blob-opacity: .55;
-  --blob-opacity-2: .45;
-  --grain-opacity: .16;
-  --hero-wash-opacity: .62;
+  --blob-opacity: .20;
+  --blob-opacity-2: .16;
+  --grain-opacity: .07;
+  --hero-wash-opacity: .24;
 }
 
 :root[data-theme="dark"] {
@@ -30,7 +30,7 @@
   --surface: rgba(255, 255, 255, 0.045);
   --surface-solid: #1a1633;
   --text: #edeaff;
-  --text-soft: #a8a2ce;
+  --text-soft: #b4aed6;
   --accent: #19e3c0;
   --on-accent: #07101d;
   --accent-2: #9a7bff;
@@ -38,10 +38,10 @@
   --glow: rgba(25, 227, 192, 0.22);
   --border: rgba(255, 255, 255, 0.11);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  --blob-opacity: .42;
-  --blob-opacity-2: .34;
-  --grain-opacity: .10;
-  --hero-wash-opacity: .46;
+  --blob-opacity: .26;
+  --blob-opacity-2: .20;
+  --grain-opacity: .09;
+  --hero-wash-opacity: .28;
 }
 
 * { box-sizing: border-box; }
@@ -77,9 +77,9 @@ html::before {
   z-index: -4;
   background:
     linear-gradient(165deg,
-      color-mix(in srgb, var(--accent) 12%, var(--bg)) 0%,
+      color-mix(in srgb, var(--accent) 10%, var(--bg)) 0%,
       var(--bg) 42%,
-      color-mix(in srgb, var(--accent-2) 14%, var(--bg)) 100%);
+      color-mix(in srgb, var(--accent-2) 12%, var(--bg)) 100%);
 }
 
 /* Two large forms, upper left and right. */
@@ -89,12 +89,12 @@ body::before {
   z-index: -3;
   background:
     radial-gradient(42% 44% at 34% 32%,
-      color-mix(in srgb, var(--accent) 78%, transparent) 0%,
-      color-mix(in srgb, var(--accent) 26%, transparent) 46%,
+      color-mix(in srgb, var(--accent) 52%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 18%, transparent) 46%,
       transparent 72%),
     radial-gradient(38% 42% at 78% 24%,
-      color-mix(in srgb, var(--accent-2) 82%, transparent) 0%,
-      color-mix(in srgb, var(--accent-2) 24%, transparent) 48%,
+      color-mix(in srgb, var(--accent-2) 55%, transparent) 0%,
+      color-mix(in srgb, var(--accent-2) 17%, transparent) 48%,
       transparent 74%);
   filter: blur(48px) saturate(125%);
   opacity: var(--blob-opacity);
@@ -108,12 +108,12 @@ body::after {
   z-index: -2;
   background:
     radial-gradient(40% 44% at 70% 62%,
-      color-mix(in srgb, var(--accent-2) 74%, transparent) 0%,
-      color-mix(in srgb, var(--accent-2) 22%, transparent) 46%,
+      color-mix(in srgb, var(--accent-2) 48%, transparent) 0%,
+      color-mix(in srgb, var(--accent-2) 15%, transparent) 46%,
       transparent 72%),
     radial-gradient(34% 38% at 26% 74%,
-      color-mix(in srgb, var(--accent-3) 62%, transparent) 0%,
-      color-mix(in srgb, var(--accent-3) 18%, transparent) 44%,
+      color-mix(in srgb, var(--accent-3) 42%, transparent) 0%,
+      color-mix(in srgb, var(--accent-3) 13%, transparent) 44%,
       transparent 70%);
   filter: blur(56px) saturate(120%);
   opacity: var(--blob-opacity-2);
