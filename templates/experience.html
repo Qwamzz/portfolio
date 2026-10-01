@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_head %}
+
+{% block title %}Experience — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
+{% block description %}{{ intro.intro or "Work experience" }}{% endblock %}
+
+{% block content %}
+{{ page_head("Experience", intro, "Experience") }}
+
+{% for group, roles in experience_groups %}
+<section class="section section-ruled">
+  <div class="wrap split">
+    <aside class="split-side">
+      <p class="eyebrow">{{ group }}</p>
+      <p class="split-count">{{ roles|length }} {{ "role" if roles|length == 1 else "roles" }}</p>
+    </aside>
+
+    <div class="split-main">
+      {% for r in roles %}
+      <article class="entry reveal">
+        <p class="entry-when">{{ r.period }}</p>
+        <h2 class="entry-title">{{ r.role }}</h2>
+        <p class="entry-org">{{ r.org }}</p>
+        {% if r.bullets %}
+        <ul class="ticks">{% for b in r.bullets %}<li>{{ b }}</li>{% endfor %}</ul>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

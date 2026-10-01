@@ -1,7 +1,8 @@
 # Deploying the portfolio to Azure App Service
 
-The site is static HTML, CSS, JS and SVG. `app.py` is a thin Flask wrapper that gives Azure a
-WSGI entry point, serves extensionless URLs, sets cache headers and exposes `/healthz`.
+`app.py` is a Flask app that renders the pages from Jinja templates, filled from a JSON
+content store on the persistent volume. It also serves the admin API, static assets and a
+`/healthz` probe.
 
 Target: **Linux App Service, Python 3.12**, started with
 
@@ -56,7 +57,7 @@ Save either setting and App Service restarts the app.
 ## Turning on the site admin
 
 `/admin` lets you edit every section of the site - home, education, experience, projects,
-certifications (including certificate uploads) and contact - without editing code or
+certifications (including certificate uploads), contact and your portrait - without editing code or
 redeploying. It stays switched off until a password is configured.
 
 Under **Configuration -> Application settings** add:

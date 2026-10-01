@@ -1,8 +1,9 @@
 """Portfolio site server, sized for Azure App Service (Linux, Python).
 
-The pages are static HTML, CSS, JS and SVG. Their content comes from a small
-JSON store on the persistent volume, so every section can be edited at /admin
-without touching code or redeploying. See content_schema.py for the collections.
+Pages are rendered on the server from Jinja templates in templates/, filled
+from a small JSON store on the persistent volume, so every section can be
+edited at /admin without touching code or redeploying. See content_schema.py
+for the collections.
 
 App Service runs this with gunicorn (see DEPLOY.md), which needs a WSGI
 callable named `app`.
@@ -19,10 +20,10 @@ import time
 import uuid
 from datetime import datetime, timezone
 
-from flask import Flask, Response, jsonify, request, send_from_directory, session
+from flask import Flask, Response, jsonify, render_template, request, send_from_directory, session
 from werkzeug.utils import secure_filename
 
-from content_schema import SCHEMA, SEPARATE_FILES
+from content_schema import CERT_CATEGORIES, EXPERIENCE_GROUPS, SCHEMA, SEPARATE_FILES
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,7 +48,7 @@ mimetypes.add_type("image/svg+xml", ".svg")
 mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("application/javascript", ".js")
 
-app = Flask(__name__, static_folder=None)
+app = Flask(__name__, static_folder=None, template_folder=os.path.join(ROOT, "templates"))
 app.config.update(
     MAX_CONTENT_LENGTH=MAX_UPLOAD_BYTES,
     SESSION_COOKIE_HTTPONLY=True,
@@ -60,8 +61,6 @@ app.json.sort_keys = False
 app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
-
-PAGES = ("index", "education", "experience", "projects", "certifications", "contact")
 
 _failures = {}
 
@@ -93,14 +92,38 @@ def _write_json(path, data):
     os.replace(tmp, path)
 
 
+def _seed_content():
+    seed = _read_json(CONTENT_SEED, {})
+    return seed if isinstance(seed, dict) else {}
+
+
 def load_collection(name):
     _ensure_store()
     if name in SEPARATE_FILES:
         data = _read_json(CERTS_FILE, [])
         return data if isinstance(data, list) else []
+
     content = _read_json(CONTENT_FILE, {})
-    items = content.get(name, []) if isinstance(content, dict) else []
-    return items if isinstance(items, list) else []
+    if not isinstance(content, dict):
+        content = {}
+    seed = _seed_content().get(name, [])
+
+    # A collection added after the store was created falls back to the seed.
+    if name not in content:
+        return seed if isinstance(seed, list) else []
+
+    items = content.get(name)
+    if not isinstance(items, list):
+        return []
+
+    # Fields added later are filled from the matching seed entry, but anything
+    # already stored - including a value deliberately left blank - wins.
+    seed_by_id = {entry.get("id"): entry for entry in seed if isinstance(entry, dict)}
+    merged = []
+    for item in items:
+        defaults = seed_by_id.get(item.get("id"))
+        merged.append({**defaults, **item} if defaults else item)
+    return merged
 
 
 def save_collection(name, items):
@@ -162,15 +185,34 @@ def clean_item(collection, form, existing=None):
     return item, None
 
 
-def _store_upload(collection, item, upload):
-    ext = os.path.splitext(upload.filename)[1].lower()
-    if ext not in ALLOWED_EXT:
-        return "Allowed file types: PNG, JPG, WEBP, GIF, PDF."
-    _ensure_store()
-    stored = secure_filename(item["id"] + ext)
-    upload.save(os.path.join(UPLOAD_DIR, stored))
-    item["file"] = "/uploads/" + stored
+def _file_fields(collection):
+    return [f["name"] for f in SCHEMA[collection]["fields"] if f["type"] == "file"]
+
+
+def _store_uploads(collection, item):
+    """Save any uploaded files for this item. Returns an error message or None."""
+    for field in _file_fields(collection):
+        upload = request.files.get(field)
+        if not upload or not upload.filename:
+            continue
+        ext = os.path.splitext(upload.filename)[1].lower()
+        if ext not in ALLOWED_EXT:
+            return "Allowed file types: PNG, JPG, WEBP, GIF, PDF."
+        _ensure_store()
+        previous = item.get(field)
+        stored = secure_filename("%s-%s-%s%s" % (item["id"], field, uuid.uuid4().hex[:6], ext))
+        upload.save(os.path.join(UPLOAD_DIR, stored))
+        item[field] = "/uploads/" + stored
+        _remove_upload(previous)
     return None
+
+
+def _remove_upload(url):
+    if not url or not str(url).startswith("/uploads/"):
+        return
+    path = os.path.join(UPLOAD_DIR, os.path.basename(url))
+    if os.path.isfile(path):
+        os.remove(path)
 
 
 # --------------------------------------------------------------------------
@@ -242,11 +284,9 @@ def api_create(collection):
     item["id"] = _slug(item.get(spec["title_field"], collection)) + "-" + uuid.uuid4().hex[:4]
     item["added"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    upload = request.files.get("file")
-    if upload and upload.filename:
-        error = _store_upload(collection, item, upload)
-        if error:
-            return jsonify(error=error), 400
+    error = _store_uploads(collection, item)
+    if error:
+        return jsonify(error=error), 400
 
     items.append(item)
     save_collection(collection, items)
@@ -270,11 +310,15 @@ def api_update(collection, item_id):
         if error:
             return jsonify(error=error), 400
 
-        upload = request.files.get("file")
-        if upload and upload.filename:
-            error = _store_upload(collection, item, upload)
-            if error:
-                return jsonify(error=error), 400
+        error = _store_uploads(collection, item)
+        if error:
+            return jsonify(error=error), 400
+
+        # "Remove" ticks on file fields clear the stored file.
+        for field in _file_fields(collection):
+            if request.form.get("remove_" + field) == "1" and not request.files.get(field):
+                _remove_upload(item.get(field))
+                item[field] = ""
 
         items[index] = item
         save_collection(collection, items)
@@ -297,10 +341,9 @@ def api_delete(collection, item_id):
         return jsonify(error="No entry with that id."), 404
 
     for item in items:
-        if item.get("id") == item_id and item.get("file"):
-            path = os.path.join(UPLOAD_DIR, os.path.basename(item["file"]))
-            if os.path.isfile(path):
-                os.remove(path)
+        if item.get("id") == item_id:
+            for field in _file_fields(collection):
+                _remove_upload(item.get(field))
 
     save_collection(collection, remaining)
     return jsonify(ok=True)
@@ -333,7 +376,7 @@ def api_move(collection, item_id):
 @app.route("/api/certifications")
 def api_certifications():
     return jsonify(
-        categories=SCHEMA["certifications"]["fields"][3]["options"],
+        categories=CERT_CATEGORIES,
         items=load_collection("certifications"),
         admin=is_admin(),
         adminEnabled=admin_enabled(),
@@ -378,18 +421,24 @@ def api_admin_logout():
 
 @app.route("/admin")
 def admin_page():
-    return _send("admin.html")
+    return _render("admin.html", "admin")
 
 
 # --------------------------------------------------------------------------
-# Static site
+# Pages
 # --------------------------------------------------------------------------
 
-_ASSET_RE = re.compile(r'(assets/(?:css|js)/[\w.-]+\.(?:css|js))"')
+PAGE_TEMPLATES = {
+    "education": "Education",
+    "experience": "Experience",
+    "projects": "Projects",
+    "certifications": "Certifications",
+    "contact": "Contact",
+}
 
 
 def asset_version():
-    """Stamp asset URLs with a build id so a deployment never serves stale CSS or JS."""
+    """Build id for asset URLs, so a deployment never serves stale CSS or JS."""
     newest = 0
     for folder in ("assets/css", "assets/js"):
         directory = os.path.join(ROOT, folder)
@@ -403,27 +452,67 @@ def asset_version():
     return str(int(newest))
 
 
-def _send(relpath):
-    if relpath.endswith(".html"):
-        with open(os.path.join(ROOT, relpath), "r", encoding="utf-8") as handle:
-            markup = handle.read()
-        markup = _ASSET_RE.sub(lambda m: m.group(1) + '?v=' + asset_version() + chr(34), markup)
-        response = Response(markup, mimetype="text/html")
-        response.headers["Cache-Control"] = "no-cache"
-        return response
+@app.context_processor
+def _template_globals():
+    version = asset_version()
+    return {
+        "asset": lambda path: "/assets/%s?v=%s" % (path, version),
+        "year": datetime.now(timezone.utc).year,
+    }
 
-    response = send_from_directory(ROOT, relpath)
-    if relpath.startswith("assets/"):
-        # Safe to cache hard: the URLs carry a version stamp.
-        response.headers["Cache-Control"] = "public, max-age=604800"
-    else:
-        response.headers["Cache-Control"] = "no-cache"
+
+@app.template_filter("paragraphs")
+def _paragraphs(text):
+    return [chunk.strip() for chunk in re.split(r"\n\s*\n", text or "") if chunk.strip()]
+
+
+def _grouped(items, key, order):
+    groups = {}
+    for item in items:
+        groups.setdefault(item.get(key) or order[-1], []).append(item)
+    names = [name for name in order if name in groups]
+    names += [name for name in groups if name not in names]
+    return [(name, groups[name]) for name in names]
+
+
+def _render(template, page):
+    content = load_all()
+    intro = next((p for p in content.get("pages", []) if p.get("page") == PAGE_TEMPLATES.get(page)), {})
+    html = render_template(
+        template,
+        page=page,
+        c=content,
+        profile=(content.get("profile") or [{}])[0],
+        contact=(content.get("contact") or [{}])[0],
+        intro=intro,
+        experience_groups=_grouped(content.get("experience", []), "group", EXPERIENCE_GROUPS),
+        cert_groups=_grouped(content.get("certifications", []), "category", CERT_CATEGORIES),
+    )
+    response = Response(html, mimetype="text/html")
+    response.headers["Cache-Control"] = "no-cache"
     return response
 
 
 @app.route("/")
+@app.route("/index.html")
 def home():
-    return _send("index.html")
+    return _render("index.html", "home")
+
+
+@app.route("/<slug>")
+def page(slug):
+    key = slug[:-5] if slug.endswith(".html") else slug
+    if key not in PAGE_TEMPLATES:
+        return _not_found(None)
+    return _render(key + ".html", key)
+
+
+@app.route("/assets/<path:path>")
+def assets(path):
+    response = send_from_directory(os.path.join(ROOT, "assets"), path)
+    # Safe to cache hard: page markup stamps every CSS/JS URL with a version.
+    response.headers["Cache-Control"] = "public, max-age=604800"
+    return response
 
 
 @app.route("/healthz")
@@ -441,18 +530,6 @@ def uploaded_file(name):
     return response
 
 
-@app.route("/<path:path>")
-def static_files(path):
-    candidate = os.path.normpath(os.path.join(ROOT, path))
-    if not candidate.startswith(ROOT):
-        return _not_found(None)
-    if os.path.isfile(candidate):
-        return _send(path)
-    if path.rstrip("/") in PAGES and os.path.isfile(candidate.rstrip(os.sep) + ".html"):
-        return _send(path.rstrip("/") + ".html")
-    return _not_found(None)
-
-
 @app.errorhandler(413)
 def _too_large(_error):
     return jsonify(error="That file is larger than 8 MB."), 413
@@ -460,16 +537,11 @@ def _too_large(_error):
 
 @app.errorhandler(404)
 def _not_found(_error):
-    body = (
-        "<!doctype html><meta charset='utf-8'>"
-        "<title>Page not found</title>"
-        "<style>body{font-family:Segoe UI,Arial,sans-serif;background:#0d0b1a;color:#edeaff;"
-        "display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center}"
-        "a{color:#19e3c0}</style>"
-        "<div><h1>404</h1><p>That page does not exist.</p>"
-        "<p><a href='/'>Back to the portfolio</a></p></div>"
-    )
-    return Response(body, status=404, mimetype="text/html")
+    try:
+        html = render_template("404.html", page="404", profile={}, contact={})
+    except Exception:  # never let the error page itself fail
+        html = "<!doctype html><title>Not found</title><p>That page does not exist. <a href='/'>Home</a></p>"
+    return Response(html, status=404, mimetype="text/html")
 
 
 if __name__ == "__main__":

@@ -1,106 +1,66 @@
-// Portfolio interactions: theme, mobile nav, accordions, scroll reveal.
+// Site behaviour: theme switch, mobile menu, nav hairline on scroll, reveal on scroll.
+// Content is rendered on the server, so nothing here is required to read the page.
 (function () {
   "use strict";
 
-  // ---------- Theme ----------
   var root = document.documentElement;
-  var stored = null;
-  try { stored = localStorage.getItem("theme"); } catch (e) { /* private mode */ }
-  if (!stored && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    stored = "dark";
-  }
-  if (stored) root.setAttribute("data-theme", stored);
-
-  function paintToggle(btn) {
-    var dark = root.getAttribute("data-theme") === "dark";
-    btn.textContent = dark ? "☀" : "☾";
-    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
-  }
 
   document.addEventListener("DOMContentLoaded", function () {
+    // ---------- Theme ----------
     var toggle = document.querySelector(".theme-toggle");
     if (toggle) {
-      paintToggle(toggle);
       toggle.addEventListener("click", function () {
         var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
         root.setAttribute("data-theme", next);
-        try { localStorage.setItem("theme", next); } catch (e) { /* ignore */ }
-        paintToggle(toggle);
+        try { localStorage.setItem("theme", next); } catch (e) { /* storage unavailable */ }
       });
     }
 
-    // ---------- Mobile navigation ----------
+    // ---------- Mobile menu ----------
     var navToggle = document.querySelector(".nav-toggle");
-    var navLinks = document.querySelector(".nav-links");
-    if (navToggle && navLinks) {
+    var menu = document.getElementById("mobile-menu");
+    if (navToggle && menu) {
       navToggle.addEventListener("click", function () {
-        var open = navLinks.classList.toggle("open");
+        var open = menu.hidden;
+        menu.hidden = !open;
         navToggle.setAttribute("aria-expanded", String(open));
+        navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
       });
     }
 
-    // ---------- Active link ----------
-    var page = location.pathname.split("/").pop() || "index.html";
-    Array.prototype.forEach.call(document.querySelectorAll(".nav-links a"), function (a) {
-      var href = a.getAttribute("href");
-      if (href === page || (page === "" && href === "index.html")) a.classList.add("active");
-    });
-
-    // ---------- Accordions ----------
-    Array.prototype.forEach.call(document.querySelectorAll(".acc-btn"), function (btn) {
-      btn.addEventListener("click", function () {
-        var body = document.getElementById(btn.getAttribute("aria-controls"));
-        if (!body) return;
-        var open = btn.getAttribute("aria-expanded") === "true";
-        btn.setAttribute("aria-expanded", String(!open));
-        body.hidden = open;
-      });
-    });
-
-    // ---------- Scroll progress bar ----------
-    var bar = document.createElement("div");
-    bar.className = "progress";
-    document.body.appendChild(bar);
-    var ticking = false;
-    function paintProgress() {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
-      bar.style.width = pct + "%";
-      ticking = false;
+    // ---------- Hairline under the nav once the page scrolls ----------
+    var nav = document.querySelector(".nav");
+    if (nav) {
+      var onScroll = function () { nav.classList.toggle("is-scrolled", window.scrollY > 8); };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
     }
-    window.addEventListener("scroll", function () {
-      if (!ticking) { ticking = true; window.requestAnimationFrame(paintProgress); }
-    }, { passive: true });
-    paintProgress();
 
-    // ---------- Scroll reveal ----------
+    // ---------- Reveal ----------
     var items = document.querySelectorAll(".reveal");
+    var show = function (el) { el.classList.add("in"); };
+
     if (!("IntersectionObserver" in window)) {
-      Array.prototype.forEach.call(items, function (el) { el.classList.add("in"); });
+      Array.prototype.forEach.call(items, show);
       return;
     }
-    var io = new IntersectionObserver(function (entries) {
+
+    var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("in");
-          io.unobserve(entry.target);
-        }
+        if (!entry.isIntersecting) return;
+        show(entry.target);
+        observer.unobserve(entry.target);
       });
-    }, { rootMargin: "0px 0px -60px 0px", threshold: 0.08 });
-    Array.prototype.forEach.call(items, function (el) { io.observe(el); });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
 
-    // Safety net: if the observer never fires (some embedded or throttled browsers),
-    // show anything that is already on screen rather than leaving it invisible.
-    setTimeout(function () {
+    Array.prototype.forEach.call(items, function (el) { observer.observe(el); });
+
+    // Anything already on screen is shown straight away, and a backstop makes
+    // sure nothing stays hidden if the observer never fires.
+    window.setTimeout(function () {
       Array.prototype.forEach.call(document.querySelectorAll(".reveal:not(.in)"), function (el) {
-        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("in");
+        if (el.getBoundingClientRect().top < window.innerHeight) show(el);
       });
-    }, 1200);
-  });
-
-  // ---------- Footer year ----------
-  document.addEventListener("DOMContentLoaded", function () {
-    var y = document.querySelector("[data-year]");
-    if (y) y.textContent = String(new Date().getFullYear());
+    }, 900);
   });
 })();

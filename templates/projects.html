@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_head, block_head %}
+
+{% block title %}Work — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
+{% block description %}{{ intro.intro or "Selected cloud engineering work" }}{% endblock %}
+
+{% block content %}
+{{ page_head("Work", intro, "Work") }}
+
+{% if c.projects %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head("Engagements", "Selected work", c.projects|length) }}
+    <div class="work-grid">
+      {% for p in c.projects %}
+      <article class="work reveal">
+        <span class="index">{{ "%02d"|format(loop.index) }}</span>
+        <h3>{{ p.title }}</h3>
+        {% for para in p.body|paragraphs %}<p>{{ para }}</p>{% endfor %}
+        {% if p.meta %}<p class="meta">{{ p.meta }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if c.repos %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head("Open source", "On GitHub", c.repos|length) }}
+    <ul class="table">
+      {% for r in c.repos %}
+      <li>
+        <a class="table-row reveal" href="{{ r.url }}" target="_blank" rel="noopener">
+          <span class="t-name">{{ r.name|replace("-", " ") }}</span>
+          <span class="t-tag">{{ r.lang }}</span>
+          <span class="t-desc">{{ r.description }}</span>
+          <span class="t-go" aria-hidden="true">↗</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if c.writing %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head("Writing", "Articles") }}
+    <div class="cells cells-2">
+      {% for w in c.writing %}
+      <a class="cell cell-link reveal" href="{{ w.link_url }}" target="_blank" rel="noopener">
+        <h3>{{ w.title }} <span aria-hidden="true">↗</span></h3>
+        {% for para in w.body|paragraphs %}<p>{{ para }}</p>{% endfor %}
+        {% if w.link_label %}<p class="meta">{{ w.link_label }}</p>{% endif %}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

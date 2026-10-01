@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found{% endblock %}
+
+{% block content %}
+<section class="page-head page-404">
+  <div class="wrap">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="page-title">Nothing<br>at this address.</h1>
+    <p class="page-intro">The page may have moved, or the link was mistyped.</p>
+    <div class="actions">
+      <a class="btn" href="/">Back home <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn-ghost" href="/projects">See the work</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block cta %}{% endblock %}

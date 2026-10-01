@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "_macros.html" import block_head %}
+
+{% block title %}Contact — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
+{% block description %}{{ intro.intro or contact.lede or "Get in touch" }}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow reveal">Contact</p>
+    <h1 class="page-title reveal">{{ intro.title or "Let's talk" }}</h1>
+    {% set lede = intro.intro or contact.lede %}
+    {% if lede %}<p class="page-intro reveal">{{ lede }}</p>{% endif %}
+
+    {% if contact.email %}
+    <a class="big-email reveal" href="mailto:{{ contact.email }}">{{ contact.email }} <span aria-hidden="true">↗</span></a>
+    {% endif %}
+
+    <dl class="contact-meta reveal">
+      {% if contact.phone %}
+      <div><dt>Phone</dt><dd><a href="{{ contact.phone_link or ('tel:' ~ contact.phone|replace(' ', '')) }}">{{ contact.phone }}</a></dd></div>
+      {% endif %}
+      {% if contact.location %}
+      <div><dt>Based in</dt><dd>{{ contact.location }}</dd></div>
+      {% endif %}
+      <div><dt>Elsewhere</dt><dd class="inline-links">
+        {% if contact.linkedin %}<a href="{{ contact.linkedin }}" target="_blank" rel="noopener">LinkedIn ↗</a>{% endif %}
+        {% if contact.github %}<a href="{{ contact.github }}" target="_blank" rel="noopener">GitHub ↗</a>{% endif %}
+        {% if contact.medium %}<a href="{{ contact.medium }}" target="_blank" rel="noopener">Medium ↗</a>{% endif %}
+        {% if contact.devto %}<a href="{{ contact.devto }}" target="_blank" rel="noopener">Dev.to ↗</a>{% endif %}
+      </dd></div>
+    </dl>
+  </div>
+</section>
+
+{% if c.services %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head("Services", "What I can help with") }}
+    <div class="cells cells-3">
+      {% for s in c.services %}
+      <article class="cell reveal">
+        <span class="index">{{ "%02d"|format(loop.index) }}</span>
+        <h3>{{ s.title }}</h3>
+        {% for para in s.body|paragraphs %}<p>{{ para }}</p>{% endfor %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{# The page itself is the call to action. #}
+{% block cta %}{% endblock %}

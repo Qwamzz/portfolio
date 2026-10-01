@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_head, block_head %}
+
+{% block title %}Education — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
+{% block description %}{{ intro.intro or "Education" }}{% endblock %}
+
+{% block content %}
+{{ page_head("Education", intro, "Education") }}
+
+{% if c.education %}
+<section class="section section-ruled">
+  <div class="wrap split">
+    <aside class="split-side">
+      <p class="eyebrow">Degrees</p>
+      <p class="split-count">{{ c.education|length }} qualifications</p>
+    </aside>
+    <div class="split-main">
+      {% for e in c.education %}
+      <article class="entry reveal">
+        <p class="entry-when">{{ e.period }}</p>
+        <h2 class="entry-title">{{ e.degree }}</h2>
+        <p class="entry-org">{{ e.school }}</p>
+        {% if e.bullets %}
+        <ul class="ticks">{% for b in e.bullets %}<li>{{ b }}</li>{% endfor %}</ul>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if c.extras %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head("Beyond the classroom", "Community & learning") }}
+    <div class="cells cells-3">
+      {% for x in c.extras %}
+      <article class="cell reveal">
+        <h3>{{ x.title }}</h3>
+        {% for para in x.body|paragraphs %}<p>{{ para }}</p>{% endfor %}
+        {% if x.link_url and x.link_label %}
+        <p class="meta"><a class="link-arrow" href="{{ x.link_url }}" target="_blank" rel="noopener">{{ x.link_label }} <span aria-hidden="true">↗</span></a></p>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

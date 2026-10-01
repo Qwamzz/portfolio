@@ -1,0 +1,16 @@
+{% macro page_head(label, intro, fallback_title) %}
+<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow reveal">{{ label }}</p>
+    <h1 class="page-title reveal">{{ intro.title or fallback_title }}</h1>
+    {% if intro.intro %}<p class="page-intro reveal">{{ intro.intro }}</p>{% endif %}
+  </div>
+</section>
+{% endmacro %}
+
+{% macro block_head(label, title, count=None) %}
+<header class="block-head">
+  <p class="eyebrow">{{ label }}</p>
+  <h2 class="block-title">{{ title }}{% if count %} <span class="count">{{ count }}</span>{% endif %}</h2>
+</header>
+{% endmacro %}
