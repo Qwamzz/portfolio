@@ -34,10 +34,10 @@
           <img src="{{ profile.photo }}" alt="Portrait of {{ profile.name }}" width="560" height="680">
         </figure>
         {% else %}
-        <div class="terminal" role="img" aria-label="Terminal summary: {{ certs|length }} certifications, based in {{ profile.location or 'Accra' }}">
+        <div class="terminal" role="img" aria-label="{{ profile.tagline or 'Cloud engineer' }} based in {{ profile.location or 'Accra' }}, holding {{ certs|length }} certifications">
           <div class="terminal-bar" aria-hidden="true"><i></i><i></i><i></i><span>~/nii — zsh</span></div>
           <pre aria-hidden="true"><span class="p">~/nii $</span> whoami
-<span class="o">cloud-security-engineer @ {{ (profile.location or "accra").split(",")[0]|lower }}</span>
+<span class="o">{{ (profile.tagline or "cloud engineer")|slug }} @ {{ (profile.location or "accra").split(",")[0]|lower }}</span>
 <span class="p">~/nii $</span> ls certifications | wc -l
 <span class="o">{{ certs|length }}</span>
 <span class="p">~/nii $</span> cat stack.txt
@@ -59,7 +59,7 @@
   {% if t|lower not in ticker|map("lower")|list %}{% set _ = ticker.append(t) %}{% endif %}
 {% endfor %}{% endfor %}
 {% if ticker %}
-<div class="marquee" aria-label="Certifications and tools">
+<div class="marquee" role="marquee" aria-label="Certifications and tools">
   <div class="marquee-track">
     {% for round in [0, 1] %}
     <ul{% if round %} aria-hidden="true"{% endif %}>

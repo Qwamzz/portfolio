@@ -526,13 +526,30 @@ a.table-row:hover .t-go { transform: translate(3px, -3px); }
 /* ---------- 404 ---------- */
 .page-404 { min-height: 60vh; }
 
-/* ---------- Reveal (only when JavaScript is running) ---------- */
-.js .reveal {
+/* ---------- Reveal ----------
+   Above the fold: a pure CSS entrance, so the first screen never waits on
+   JavaScript. Below the fold: revealed on scroll by main.js. If that script
+   never arrives, the fallback animation shows everything after 2.5s anyway. */
+.hero .reveal, .page-head .reveal {
+  animation: rise .9s var(--ease) both;
+}
+.hero .reveal:nth-child(2), .page-head .reveal:nth-child(2) { animation-delay: .08s; }
+.hero .reveal:nth-child(3), .page-head .reveal:nth-child(3) { animation-delay: .16s; }
+.hero-grid .reveal:nth-child(1) { animation-delay: .16s; }
+.hero-grid .reveal:nth-child(2) { animation-delay: .24s; }
+.page-head .reveal:nth-child(n+4) { animation-delay: .24s; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+
+.js .section .reveal:not(.in) {
   opacity: 0; transform: translateY(16px);
+  animation: reveal-fallback 0s 2.5s forwards;
+}
+.js .section .reveal {
   transition: opacity .8s var(--ease), transform .8s var(--ease);
   transition-delay: calc(var(--i, 0) * 70ms);
 }
-.js .reveal.in { opacity: 1; transform: none; }
+@keyframes reveal-fallback { to { opacity: 1; transform: none; } }
 
 /* ---------- Admin ---------- */
 .panel {
@@ -629,7 +646,8 @@ a.table-row:hover .t-go { transform: translate(3px, -3px); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .reveal { opacity: 1; transform: none; transition: none; }
+  .hero .reveal, .page-head .reveal { animation: none; }
+  .js .section .reveal, .js .section .reveal:not(.in) { opacity: 1; transform: none; transition: none; animation: none; }
   .marquee-track, .status-dot::after, .cursor { animation: none; }
   .marquee { overflow-x: auto; }
 }

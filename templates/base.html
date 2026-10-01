@@ -3,26 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}{{ profile.name or "Nii Yartey Gidiglo" }} — Cloud, security & data engineer{% endblock %}</title>
-<meta name="description" content="{% block description %}{{ profile.lede or '' }}{% endblock %}">
+{% set site_name = profile.name or "Nii Yartey Gidiglo" %}
+{% set role = profile.tagline or "Cloud, security and data engineer" %}
+<title>{% block title %}{{ site_name }} — {{ role }}{% endblock %}</title>
+<meta name="description" content="{% filter trim %}{% block description %}{{ profile.lede or role }}{% endblock %}{% endfilter %}">
+<link rel="canonical" href="{{ canonical }}">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{{ self.title()|trim }}">
+<meta property="og:description" content="{{ self.description()|trim }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:image" content="{{ absolute('/assets/img/og.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ site_name }} — {{ role }}">
+<meta name="twitter:card" content="summary_large_image">
+
 <meta name="theme-color" content="#f3f2ed" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="{{ asset('img/favicon.svg') }}" type="image/svg+xml">
+<link rel="icon" href="{{ asset('img/favicon-32.png') }}" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap">
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{# Loaded blocking and tiny: applies the saved theme before first paint, so there is no flash. #}
+<script src="{{ asset('js/theme.js') }}"></script>
 {% block head %}{% endblock %}
-<script>
-  /* Apply the saved or system theme before first paint, so there is no flash. */
-  (function () {
-    document.documentElement.classList.add("js");
-    var theme = null;
-    try { theme = localStorage.getItem("theme"); } catch (e) {}
-    if (!theme && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) theme = "dark";
-    if (theme) document.documentElement.setAttribute("data-theme", theme);
-  })();
-</script>
 </head>
 <body class="page-{{ page }}">
 

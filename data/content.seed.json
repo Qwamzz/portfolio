@@ -51,7 +51,7 @@
         "Scalable, fault-tolerant architectures with high availability, BCDR and Azure Site Recovery.",
         "Hybrid connectivity with Site-to-Site VPN, VNet design, NSG hardening and cost rightsizing."
       ],
-      "summary": "Landing zones, migrations and resilient platforms on Azure, AWS, GCP and OCI."
+      "summary": "Cloud adoption assessments, migrations to Azure IaaS and PaaS, and highly available platforms with BCDR."
     },
     {
       "id": "skill-devops",
@@ -73,7 +73,7 @@
         "Containerised workloads with Docker and Kubernetes, plus workflow automation with n8n and Power Automate.",
         "Sprint planning and delivery tracking in Azure DevOps across distributed teams."
       ],
-      "summary": "Pipelines and infrastructure-as-code that make delivery boring in the best way."
+      "summary": "CI/CD pipelines in Azure DevOps and infrastructure as code in Terraform, Bicep and ARM."
     },
     {
       "id": "skill-security",
@@ -94,7 +94,7 @@
         "Key management policies with Azure Key Vault, IAM roles and MFA enforcement.",
         "Observability with Log Analytics, Azure Monitor, Prometheus and Datadog for reliability and reduced downtime."
       ],
-      "summary": "SIEM, posture management and controls that hold up to an audit."
+      "summary": "Microsoft Sentinel deployments, Defender for Cloud, Key Vault and enterprise security controls."
     },
     {
       "id": "skill-data",
@@ -115,7 +115,7 @@
         "Kubeflow pipeline components built and connected to automate data processing workflows.",
         "Web applications in JavaScript, React, Node.js and Python with SQL and Oracle backends."
       ],
-      "summary": "Pipelines and models that turn raw operational data into decisions."
+      "summary": "ETL pipelines, regression modelling in Python and Kubeflow workflows for analytics."
     }
   ],
   "pages": [
@@ -123,13 +123,13 @@
       "id": "page-education",
       "page": "Education",
       "title": "Education",
-      "intro": "A geological engineering degree taught me to model complex systems from incomplete data. Postgraduate computer science is sharpening the software side of the same instinct."
+      "intro": "A BSc in Geological Engineering from KNUST, followed by an MSc in Computer Science at the University of Ghana."
     },
     {
       "id": "page-experience",
       "page": "Experience",
       "title": "Experience",
-      "intro": "Six years across Microsoft partner consultancies, freelance cloud delivery, data engineering and AI model training - migrating, securing and automating platforms for banking, telecoms, energy and government."
+      "intro": "Cloud, security and data work since 2019 - across Microsoft partner consultancies, freelance delivery, data engineering and AI model training, for clients in banking, telecoms, energy and government."
     },
     {
       "id": "page-projects",
@@ -147,7 +147,7 @@
       "id": "page-contact",
       "page": "Contact",
       "title": "Let's talk",
-      "intro": "Available for cloud migration, security operations, DevOps and data engineering work. The quickest route is email or LinkedIn - I usually reply within 24 hours."
+      "intro": ""
     }
   ],
   "education": [
@@ -156,10 +156,7 @@
       "degree": "MSc Computer Science",
       "school": "University of Ghana",
       "period": "Oct 2025 - Sept 2026",
-      "bullets": [
-        "Advanced study in software engineering, distributed systems and applied machine learning.",
-        "Extending hands-on cloud and data engineering practice with formal computer science theory."
-      ]
+      "bullets": []
     },
     {
       "id": "edu-bsc",
@@ -167,7 +164,6 @@
       "school": "Kwame Nkrumah University of Science and Technology (KNUST)",
       "period": "Aug 2015 - July 2019",
       "bullets": [
-        "Engineering fundamentals in modelling, data interpretation and quantitative analysis.",
         "Applied during national service at GNPC through basin, source rock and reservoir modelling."
       ]
     }
@@ -232,7 +228,8 @@
         "Automated provisioning with Terraform, Bicep and PowerShell, minimising manual error and accelerating delivery.",
         "Configured Site-to-Site VPN hybrid connectivity, Azure File Sync with lifecycle policies, and IAM roles with MFA.",
         "Monitored infrastructure with Log Analytics and Azure Monitor, improving reliability and reducing downtime.",
-        "Developed technical proposals, presentations and product demos that turned business requirements into cloud solutions, increasing project approval rates."
+        "Developed technical proposals, presentations and product demos that turned business requirements into cloud solutions, increasing project approval rates.",
+        "Used Azure DevOps for sprint planning, task assignment and progress tracking, improving team collaboration and delivery timelines."
       ]
     },
     {
@@ -249,7 +246,8 @@
         "Configured Azure Key Vault and key management policies to strengthen data security and regulatory compliance.",
         "Implemented BCDR solutions for mission-critical workloads, ensuring data availability and minimising downtime.",
         "Automated Azure deployments with Bicep, ARM templates and Terraform.",
-        "Translated high-level customer requirements into detailed technical specifications and solution designs."
+        "Translated high-level customer requirements into detailed technical specifications and solution designs.",
+        "Collaborated with QA and business analyst teams to define accurate project requirements and improve delivery timelines."
       ]
     },
     {
@@ -288,6 +286,17 @@
       ]
     },
     {
+      "id": "exp-gnpc",
+      "role": "Petroleum Geologist (National Service)",
+      "org": "Ghana National Petroleum Corporation (GNPC) · Tema, Ghana",
+      "period": "Sept 2019 - Aug 2020",
+      "group": "Earlier Roles",
+      "bullets": [
+        "Interpreted geological and geophysical data to create subsurface maps, improving exploration planning accuracy.",
+        "Conducted basin, source rock and reservoir modelling to support strategic exploration decisions."
+      ]
+    },
+    {
       "id": "exp-techbit",
       "role": "Software Engineer & Social Media Manager",
       "org": "Techbit Inc (Techpreneur Magazine) · Accra, Ghana",
@@ -297,17 +306,6 @@
         "Developed websites, web applications and software products in JavaScript, Python and Java with Oracle and SQL databases.",
         "Conceptualised and executed social content strategies, increasing audience engagement and brand visibility.",
         "Managed distribution plans and schedules aligned to marketing objectives."
-      ]
-    },
-    {
-      "id": "exp-gnpc",
-      "role": "Petroleum Geologist (National Service)",
-      "org": "Ghana National Petroleum Corporation (GNPC) · Tema, Ghana",
-      "period": "Sept 2019 - Aug 2020",
-      "group": "Earlier Roles",
-      "bullets": [
-        "Interpreted geological and geophysical data to create subsurface maps, improving exploration planning accuracy.",
-        "Conducted basin, source rock and reservoir modelling to support strategic exploration decisions."
       ]
     }
   ],
@@ -391,14 +389,14 @@
       "name": "Cloud-Engineering-and-Architecture-Projects",
       "url": "https://github.com/Qwamzz/Cloud-Engineering-and-Architecture-Projects",
       "lang": "Architecture",
-      "description": "Reference architectures, landing zone patterns and cloud design work from migration and platform engagements."
+      "description": "Collection repository for cloud engineering and architecture projects."
     },
     {
       "id": "repo-azure",
       "name": "Microsoft-Azure-Projects",
       "url": "https://github.com/Qwamzz/Microsoft-Azure-Projects",
       "lang": "Azure",
-      "description": "Azure platform work - architecture, infrastructure-as-code and platform automation samples drawn from day-to-day delivery."
+      "description": "Collection repository for Microsoft Azure projects."
     },
     {
       "id": "repo-devops",
@@ -426,14 +424,14 @@
       "name": "Deep-learning-Projects",
       "url": "https://github.com/Qwamzz/Deep-learning-Projects",
       "lang": "Deep Learning",
-      "description": "Neural network experiments and training runs across vision, audio and sequence models."
+      "description": "Collection repository for deep learning projects."
     },
     {
       "id": "repo-cv",
       "name": "Computer-Vision-Projects",
       "url": "https://github.com/Qwamzz/Computer-Vision-Projects",
-      "lang": "Computer Vision",
-      "description": "Image and video work - detection, classification and image processing pipelines."
+      "lang": "Computer vision",
+      "description": "Classical computer vision: image segmentation and object measurement, object detection and localisation, feature-based panorama construction, and road lane boundary detection."
     },
     {
       "id": "repo-ai",

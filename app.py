@@ -21,8 +21,10 @@ import uuid
 from datetime import datetime, timezone
 
 from flask import Flask, Response, jsonify, render_template, request, send_from_directory, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
 
+import content_fixes
 from content_schema import CERT_CATEGORIES, EXPERIENCE_GROUPS, SCHEMA, SEPARATE_FILES
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -49,6 +51,8 @@ mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("application/javascript", ".js")
 
 app = Flask(__name__, static_folder=None, template_folder=os.path.join(ROOT, "templates"))
+# App Service terminates TLS in front of gunicorn and forwards the original scheme and host.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config.update(
     MAX_CONTENT_LENGTH=MAX_UPLOAD_BYTES,
     SESSION_COOKIE_HTTPONLY=True,
@@ -123,7 +127,7 @@ def load_collection(name):
     for item in items:
         defaults = seed_by_id.get(item.get("id"))
         merged.append({**defaults, **item} if defaults else item)
-    return merged
+    return content_fixes.apply(name, merged)
 
 
 def save_collection(name, items):
@@ -455,10 +459,21 @@ def asset_version():
 @app.context_processor
 def _template_globals():
     version = asset_version()
+    root = request.url_root.rstrip("/")
+    path = request.path
+    if path.endswith(".html"):
+        path = "/" if path == "/index.html" else path[:-5]
     return {
-        "asset": lambda path: "/assets/%s?v=%s" % (path, version),
+        "asset": lambda p: "/assets/%s?v=%s" % (p, version),
+        "absolute": lambda p: root + p,
+        "canonical": root + path,
         "year": datetime.now(timezone.utc).year,
     }
+
+
+@app.template_filter("slug")
+def _slug_filter(text):
+    return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
 
 
 @app.template_filter("paragraphs")
@@ -513,6 +528,54 @@ def assets(path):
     # Safe to cache hard: page markup stamps every CSS/JS URL with a version.
     response.headers["Cache-Control"] = "public, max-age=604800"
     return response
+
+
+CSP = "; ".join([
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'",
+    "font-src https://fonts.gstatic.com",
+    "img-src 'self' data:",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+])
+
+
+@app.after_request
+def _security_headers(response):
+    response.headers.setdefault("Content-Security-Policy", CSP)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if request.is_secure:
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
+
+
+@app.route("/robots.txt")
+def robots():
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin",
+        "Disallow: /api/",
+        "Sitemap: %s/sitemap.xml" % request.url_root.rstrip("/"),
+    ]
+    return Response("\n".join(lines) + "\n", mimetype="text/plain")
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    root = request.url_root.rstrip("/")
+    urls = [root + "/"] + [root + "/" + key for key in PAGE_TEMPLATES]
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    lines += ["  <url><loc>%s</loc></url>" % url for url in urls]
+    lines.append("</urlset>")
+    return Response("\n".join(lines) + "\n", mimetype="application/xml")
 
 
 @app.route("/healthz")
