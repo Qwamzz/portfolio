@@ -8,6 +8,10 @@ through /admin no longer matches and is left alone.
 """
 
 FIELD_FIXES = [
+    # Availability line reworded.
+    ("profile", "profile", "availability",
+     "Open to cloud and security engagements", "Open to cloud and AI engagements"),
+
     # Education detail that was not in the CV.
     ("education", "edu-msc", "bullets",
      ["Advanced study in software engineering, distributed systems and applied machine learning.",
