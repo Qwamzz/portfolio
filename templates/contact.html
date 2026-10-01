@@ -2,14 +2,14 @@
 {% from "_macros.html" import block_head %}
 
 {% block title %}Contact — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
-{% block description %}{{ intro.intro or contact.lede or "Get in touch" }}{% endblock %}
+{% block description %}{{ contact.lede or intro.intro or "Get in touch" }}{% endblock %}
 
 {% block content %}
 <section class="page-head">
   <div class="wrap">
     <p class="eyebrow reveal">Contact</p>
     <h1 class="page-title reveal">{{ intro.title or "Let's talk" }}</h1>
-    {% set lede = intro.intro or contact.lede %}
+    {% set lede = contact.lede or intro.intro %}
     {% if lede %}<p class="page-intro reveal">{{ lede }}</p>{% endif %}
 
     {% if contact.email %}

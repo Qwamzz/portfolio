@@ -54,11 +54,15 @@ and it appears in the editor and in the data passed to the templates.
 The admin area is disabled until `ADMIN_PASSWORD` is set on the web app, and every write
 endpoint requires that session. See [DEPLOY.md](DEPLOY.md#turning-on-the-site-admin).
 
-### Content defaults
+### Content defaults and corrections
 
 `data/content.seed.json` and `data/certifications.seed.json` seed the store on first run. When
 the schema grows, fields and sections missing from an existing store are filled from the seed
 at read time; anything already stored, including values deliberately left blank, wins.
+
+[content_fixes.py](content_fixes.py) corrects starting content that is already in a live store.
+Each correction names the exact text originally seeded and applies only while the stored value
+still matches it, so nothing edited through `/admin` is ever overwritten.
 
 ## Running locally
 
@@ -87,13 +91,26 @@ content_schema.py          Every editable collection and field
 templates/                 Jinja templates - base layout, one per page, admin, 404
 data/*.seed.json           Starting content, copied to the volume on first run
 assets/css/style.css       All styling, both themes
+assets/js/theme.js         Applies the saved theme before first paint
 assets/js/main.js          Theme toggle, mobile menu, reveal on scroll
 assets/js/admin.js         Schema-driven admin editor
-assets/img/favicon.svg     Favicon
+assets/img/                Favicons, touch icon and share card
+content_fixes.py           Safe corrections to content already in a live store
+tools/                     Share-card generator (needs Pillow; not a site dependency)
 requirements.txt           Flask and gunicorn
 deploy-azure.sh            One-shot Azure provisioning and deployment
 .github/workflows/         Deploy workflow from Azure Deployment Center
 ```
 
-Only pages, `/assets/`, `/uploads/` and the API are served; source files, templates and seed
-data are not reachable over HTTP.
+## Hardening and metadata
+
+- Only pages, `/assets/`, `/uploads/`, the API, `robots.txt` and `sitemap.xml` are served; source
+  files, templates and seed data are not reachable over HTTP.
+- Every response carries a Content-Security-Policy (scripts from this origin only, fonts from
+  Google Fonts), HSTS, `X-Frame-Options: DENY`, `nosniff`, a referrer policy and a permissions
+  policy. There is no inline script, so the policy needs no exceptions for it.
+- Open Graph and Twitter tags with a 1200x630 share card (`assets/img/og.png`), a canonical URL
+  per page, and touch icons. Regenerate the images with
+  [tools/make_share_images.py](tools/make_share_images.py) if the name or focus changes.
+- The first screen animates in with CSS alone; content further down is revealed on scroll and
+  falls back to visible after 2.5 seconds if the script never loads.
