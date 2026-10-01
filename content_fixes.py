@@ -96,3 +96,109 @@ def apply(collection, items):
             items = [by_id[item_id] for item_id in new_order]
 
     return items
+
+
+# --------------------------------------------------------------------------
+# One-time migrations
+#
+# Read-time fixes above cannot add or remove entries: an added entry would
+# reappear every time it was deleted in /admin. Structural changes are applied
+# once instead, written to the store and recorded in a ledger so they never run
+# again. Every step still checks the stored data first and skips anything that
+# has been edited since it was seeded.
+# --------------------------------------------------------------------------
+
+MIGRATIONS = [
+    {
+        # Updated CV, October 2026: AZ-500 replaced by SC-500, SC-100 earned,
+        # MS-900 dropped, OCI AI Foundations no longer styled "Associate".
+        "id": "2026-10-cv-certifications",
+        "collection": "certifications",
+        "steps": [
+            ("update", "az-500",
+             {"code": "AZ-500", "name": "Azure Security Engineer Associate"},
+             {"code": "SC-500", "name": "Cloud and AI Security Engineer Associate"}),
+            ("insert_after", "az-400",
+             {"id": "sc-100", "code": "SC-100", "name": "Cybersecurity Architect Expert",
+              "issuer": "Microsoft", "category": "Microsoft", "note": "Expert level"}),
+            ("remove",
+             {"id": "ms-900", "code": "MS-900", "name": "Microsoft 365 Certified: Fundamentals",
+              "issuer": "Microsoft", "category": "Microsoft", "note": "Fundamentals"}),
+            ("update", "oci-ai",
+             {"name": "Oracle Cloud Infrastructure Certified AI Foundations Associate", "note": "Associate"},
+             {"name": "Oracle Cloud Infrastructure Certified AI Foundations", "note": "Foundations"}),
+        ],
+    },
+]
+
+
+def _apply_step(items, step):
+    """Apply one step to a list of entries. Returns (items, changed)."""
+    kind = step[0]
+
+    if kind == "update":
+        _, item_id, expect, new = step
+        for item in items:
+            if item.get("id") == item_id and all(item.get(k) == v for k, v in expect.items()):
+                item.update(new)
+                return items, True
+        return items, False
+
+    if kind == "insert_after":
+        _, anchor, entry = step
+        if any(i.get("id") == entry["id"] or i.get("code") == entry.get("code") for i in items):
+            return items, False  # already there, perhaps added by hand
+        position = next((n + 1 for n, i in enumerate(items) if i.get("id") == anchor), len(items))
+        return items[:position] + [dict(entry)] + items[position:], True
+
+    if kind == "remove":
+        _, original = step
+        # Only an untouched entry is removed; one with an upload or edits stays.
+        kept = [i for i in items if i != original]
+        return kept, len(kept) != len(items)
+
+    raise ValueError("Unknown migration step: %r" % (kind,))
+
+
+def run_migrations(load, save, ledger_path):
+    """Apply pending migrations once. load(name) / save(name, items) touch the raw store."""
+    import json
+    import os
+
+    try:
+        with open(ledger_path, "r", encoding="utf-8") as handle:
+            done = set(json.load(handle))
+    except (OSError, ValueError):
+        done = set()
+
+    lock = ledger_path + ".lock"
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        return []  # another worker is migrating right now
+    applied = []
+    try:
+        os.close(fd)
+        for migration in MIGRATIONS:
+            if migration["id"] in done:
+                continue
+            items = load(migration["collection"])
+            changed = False
+            for step in migration["steps"]:
+                items, step_changed = _apply_step(items, step)
+                changed = changed or step_changed
+            if changed:
+                save(migration["collection"], items)
+            done.add(migration["id"])
+            applied.append(migration["id"])
+        if applied:
+            tmp = ledger_path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as handle:
+                json.dump(sorted(done), handle, indent=2)
+            os.replace(tmp, ledger_path)
+    finally:
+        try:
+            os.remove(lock)
+        except OSError:
+            pass
+    return applied

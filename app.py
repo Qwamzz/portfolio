@@ -142,6 +142,22 @@ def save_collection(name, items):
     _write_json(CONTENT_FILE, content)
 
 
+def _raw_load(name):
+    _ensure_store()
+    if name in SEPARATE_FILES:
+        data = _read_json(CERTS_FILE, [])
+        return data if isinstance(data, list) else []
+    content = _read_json(CONTENT_FILE, {})
+    items = content.get(name, []) if isinstance(content, dict) else []
+    return items if isinstance(items, list) else []
+
+
+try:
+    content_fixes.run_migrations(_raw_load, save_collection, os.path.join(DATA_DIR, "migrations.json"))
+except OSError:
+    pass  # a read-only or missing volume must not stop the site from serving
+
+
 def load_all():
     return {name: load_collection(name) for name in SCHEMA}
 
