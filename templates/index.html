@@ -37,7 +37,7 @@
         <div class="terminal" role="img" aria-label="{{ profile.tagline or 'Cloud engineer' }} based in {{ profile.location or 'Accra' }}, holding {{ certs|length }} certifications">
           <div class="terminal-bar" aria-hidden="true"><i></i><i></i><i></i><span>~/nii — zsh</span></div>
           <pre aria-hidden="true"><span class="p">~/nii $</span> whoami
-<span class="o">{{ (profile.tagline or "cloud engineer")|slug }} @ {{ (profile.location or "accra").split(",")[0]|lower }}</span>
+<span class="o">{{ (profile.tagline or "cloud engineer")|slug }}</span>
 <span class="p">~/nii $</span> ls certifications | wc -l
 <span class="o">{{ certs|length }}</span>
 <span class="p">~/nii $</span> cat stack.txt
