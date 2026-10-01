@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ profile.name or "Nii Yartey Gidiglo" }} — Cloud, security & data engineer{% endblock %}</title>
+<meta name="description" content="{% block description %}{{ profile.lede or '' }}{% endblock %}">
+<meta name="theme-color" content="#f3f2ed" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="{{ asset('img/favicon.svg') }}" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% block head %}{% endblock %}
+<script>
+  /* Apply the saved or system theme before first paint, so there is no flash. */
+  (function () {
+    document.documentElement.classList.add("js");
+    var theme = null;
+    try { theme = localStorage.getItem("theme"); } catch (e) {}
+    if (!theme && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) theme = "dark";
+    if (theme) document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+</head>
+<body class="page-{{ page }}">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="wordmark" href="/" aria-label="Home">
+      <span class="wordmark-mark" aria-hidden="true">NY</span>
+      <span class="wordmark-name">{{ profile.name or "Nii Yartey Gidiglo" }}</span>
+    </a>
+
+    <nav class="nav-pill" aria-label="Primary">
+      {% set links = [("/", "home", "Home"), ("/experience", "experience", "Experience"), ("/projects", "projects", "Work"), ("/certifications", "certifications", "Certifications"), ("/education", "education", "Education")] %}
+      {% for href, key, label in links %}
+        <a href="{{ href }}"{% if page == key %} class="is-active" aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </nav>
+
+    <div class="nav-end">
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch colour theme">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+      </button>
+      <a class="btn btn-sm" href="/contact">Get in touch <span class="arrow" aria-hidden="true">→</span></a>
+      <button class="icon-btn nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    {% for href, key, label in links %}
+      <a href="{{ href }}"{% if page == key %} aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+    <a href="/contact"{% if page == "contact" %} aria-current="page"{% endif %}>Contact</a>
+  </div>
+</header>
+
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+
+{% block cta %}
+<section class="cta">
+  <div class="wrap">
+    <p class="eyebrow eyebrow-on-dark">Contact</p>
+    <h2 class="cta-title">Let's build something<br>that stays up.</h2>
+    <div class="cta-row">
+      {% if contact.email %}
+      <a class="cta-email" href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+      {% endif %}
+      <a class="btn btn-accent" href="/contact">Start a conversation <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <p>© {{ year }} {{ profile.name or "Nii Yartey Gidiglo" }}<span class="sep">/</span>{{ profile.location or contact.location or "Accra, Ghana" }}</p>
+    <ul class="footer-links">
+      {% if contact.github %}<li><a href="{{ contact.github }}" target="_blank" rel="noopener">GitHub ↗</a></li>{% endif %}
+      {% if contact.linkedin %}<li><a href="{{ contact.linkedin }}" target="_blank" rel="noopener">LinkedIn ↗</a></li>{% endif %}
+      {% if contact.medium %}<li><a href="{{ contact.medium }}" target="_blank" rel="noopener">Medium ↗</a></li>{% endif %}
+      {% if contact.devto %}<li><a href="{{ contact.devto }}" target="_blank" rel="noopener">Dev.to ↗</a></li>{% endif %}
+      <li><a href="#main">Back to top ↑</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="{{ asset('js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

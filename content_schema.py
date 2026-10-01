@@ -1,7 +1,8 @@
 """Definition of every editable collection on the site.
 
-The admin page builds its forms from this, and the API validates against it, so
-adding a field here is all it takes to make it editable.
+The admin page builds its forms from this, the API validates against it and
+the page templates read the same keys, so adding a field here is all it takes
+to make it editable.
 
 Field types:
   text      single line
@@ -9,22 +10,12 @@ Field types:
   lines     one entry per line, stored as a list
   select    fixed set of options
   url       single line, must start with http:// or https://
-  file      upload stored on the persistent volume
+  file      upload stored on the persistent volume, saved under the field's name
 """
-
-ILLUSTRATIONS = [
-    "assets/img/cloud-hero.svg",
-    "assets/img/devops.svg",
-    "assets/img/security.svg",
-    "assets/img/data.svg",
-    "assets/img/education.svg",
-    "assets/img/experience.svg",
-    "assets/img/projects.svg",
-    "assets/img/contact.svg",
-]
 
 EXPERIENCE_GROUPS = ["Cloud Engineering", "Data & AI", "Earlier Roles"]
 CERT_CATEGORIES = ["Microsoft", "Cloud & Cloud Native", "Security & Standards", "Other"]
+PAGE_KEYS = ["Education", "Experience", "Projects", "Certifications", "Contact"]
 
 SCHEMA = {
     "profile": {
@@ -34,8 +25,11 @@ SCHEMA = {
         "title_field": "name",
         "fields": [
             {"name": "name", "label": "Name", "type": "text", "required": True},
-            {"name": "tagline", "label": "Tagline", "type": "text"},
+            {"name": "tagline", "label": "Role line", "type": "text"},
             {"name": "lede", "label": "Introduction", "type": "textarea"},
+            {"name": "availability", "label": "Availability note", "type": "text"},
+            {"name": "location", "label": "Based in", "type": "text"},
+            {"name": "photo", "label": "Portrait photo (optional)", "type": "file"},
         ],
     },
     "stats": {
@@ -53,9 +47,19 @@ SCHEMA = {
         "title_field": "title",
         "fields": [
             {"name": "title", "label": "Heading", "type": "text", "required": True},
-            {"name": "tags", "label": "Tags (one per line)", "type": "lines"},
+            {"name": "summary", "label": "One-line summary", "type": "text"},
+            {"name": "tags", "label": "Tools (one per line)", "type": "lines"},
             {"name": "bullets", "label": "Bullet points (one per line)", "type": "lines"},
-            {"name": "image", "label": "Illustration", "type": "select", "options": ILLUSTRATIONS},
+        ],
+    },
+    "pages": {
+        "label": "Page headings",
+        "page": "All pages",
+        "title_field": "page",
+        "fields": [
+            {"name": "page", "label": "Page", "type": "select", "options": PAGE_KEYS},
+            {"name": "title", "label": "Heading", "type": "text", "required": True},
+            {"name": "intro", "label": "Introduction", "type": "textarea"},
         ],
     },
     "education": {
@@ -66,7 +70,6 @@ SCHEMA = {
             {"name": "degree", "label": "Qualification", "type": "text", "required": True},
             {"name": "school", "label": "Institution", "type": "text", "required": True},
             {"name": "period", "label": "Dates", "type": "text"},
-            {"name": "badge", "label": "Badge initials", "type": "text"},
             {"name": "bullets", "label": "Details (one per line)", "type": "lines"},
         ],
     },
@@ -159,6 +162,10 @@ SCHEMA = {
             {"name": "phone", "label": "Phone number", "type": "text"},
             {"name": "phone_link", "label": "Phone link (tel:)", "type": "text"},
             {"name": "location", "label": "Location", "type": "text"},
+            {"name": "github", "label": "GitHub link", "type": "url"},
+            {"name": "linkedin", "label": "LinkedIn link", "type": "url"},
+            {"name": "medium", "label": "Medium link", "type": "url"},
+            {"name": "devto", "label": "Dev.to link", "type": "url"},
         ],
     },
     "services": {

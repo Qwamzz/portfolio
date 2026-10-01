@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set certs = c.certifications or [] %}
+
+<section class="hero">
+  <div class="wrap">
+    {% if profile.availability %}
+    <p class="status reveal"><span class="status-dot" aria-hidden="true"></span>{{ profile.availability }}</p>
+    {% endif %}
+
+    {% set parts = (profile.name or "Nii Yartey Gidiglo").split(" ") %}
+    <h1 class="hero-name reveal">
+      {%- if parts|length > 2 -%}
+        {{ parts[:-1]|join(" ") }}<br>{{ parts[-1] }}
+      {%- else -%}
+        {{ parts|join(" ") }}
+      {%- endif -%}
+    </h1>
+
+    <div class="hero-grid">
+      <div class="hero-copy reveal">
+        {% if profile.tagline %}<p class="hero-role">{{ profile.tagline }}</p>{% endif %}
+        {% if profile.lede %}<p class="hero-lede">{{ profile.lede }}</p>{% endif %}
+        <div class="actions">
+          <a class="btn" href="/projects">See the work <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn-ghost" href="/contact">Get in touch</a>
+        </div>
+      </div>
+
+      <div class="hero-side reveal">
+        {% if profile.photo %}
+        <figure class="portrait">
+          <img src="{{ profile.photo }}" alt="Portrait of {{ profile.name }}" width="560" height="680">
+        </figure>
+        {% else %}
+        <div class="terminal" role="img" aria-label="Terminal summary: {{ certs|length }} certifications, based in {{ profile.location or 'Accra' }}">
+          <div class="terminal-bar" aria-hidden="true"><i></i><i></i><i></i><span>~/nii — zsh</span></div>
+          <pre aria-hidden="true"><span class="p">~/nii $</span> whoami
+<span class="o">cloud-security-engineer @ {{ (profile.location or "accra").split(",")[0]|lower }}</span>
+<span class="p">~/nii $</span> ls certifications | wc -l
+<span class="o">{{ certs|length }}</span>
+<span class="p">~/nii $</span> cat stack.txt
+<span class="o">{% for s in c.skills[:3] %}{% for t in (s.tags or [])[:2] %}{{ t|lower|replace(" ", "-") }}  {% endfor %}{% endfor %}</span>
+<span class="p">~/nii $</span> <span class="cursor"></span></pre>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ---------- Marquee ---------- #}
+{% set ticker = [] %}
+{% for cert in certs %}
+  {% if cert.code and cert.code is string and cert.code|select("in", "0123456789")|list and cert.code not in ticker %}{% set _ = ticker.append(cert.code) %}{% endif %}
+{% endfor %}
+{% for s in c.skills %}{% for t in (s.tags or [])[:3] %}
+  {% if t|lower not in ticker|map("lower")|list %}{% set _ = ticker.append(t) %}{% endif %}
+{% endfor %}{% endfor %}
+{% if ticker %}
+<div class="marquee" aria-label="Certifications and tools">
+  <div class="marquee-track">
+    {% for round in [0, 1] %}
+    <ul{% if round %} aria-hidden="true"{% endif %}>
+      {% for item in ticker %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{# ---------- Numbers ---------- #}
+{% if c.stats %}
+<section class="section">
+  <div class="wrap">
+    <dl class="stats">
+      {% for s in c.stats %}
+      <div class="stat reveal" style="--i: {{ loop.index0 }}">
+        <dt>{{ s.label }}</dt>
+        <dd>{{ s.value }}</dd>
+      </div>
+      {% endfor %}
+    </dl>
+  </div>
+</section>
+{% endif %}
+
+{# ---------- Capabilities ---------- #}
+{% if c.skills %}
+<section class="section section-ruled">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="eyebrow">Capabilities</p>
+      <h2 class="section-title">What I do</h2>
+    </header>
+
+    <ol class="capabilities">
+      {% for s in c.skills %}
+      <li class="capability reveal">
+        <span class="index">{{ "%02d"|format(loop.index) }}</span>
+        <h3>{{ s.title }}</h3>
+        <div class="capability-body">
+          {% if s.summary %}<p class="capability-summary">{{ s.summary }}</p>{% endif %}
+          {% if s.tags %}
+          <ul class="chips">{% for t in s.tags %}<li>{{ t }}</li>{% endfor %}</ul>
+          {% endif %}
+          {% if s.bullets %}
+          <details class="more">
+            <summary>What this covers</summary>
+            <ul class="ticks">{% for b in s.bullets %}<li>{{ b }}</li>{% endfor %}</ul>
+          </details>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+{# ---------- Selected work ---------- #}
+{% if c.projects %}
+<section class="section section-ruled">
+  <div class="wrap">
+    <header class="section-head section-head-row">
+      <div>
+        <p class="eyebrow">Selected work</p>
+        <h2 class="section-title">Recent engagements</h2>
+      </div>
+      <a class="link-arrow" href="/projects">All work <span aria-hidden="true">→</span></a>
+    </header>
+
+    <div class="work-grid">
+      {% for p in c.projects[:4] %}
+      <article class="work reveal">
+        <span class="index">{{ "%02d"|format(loop.index) }}</span>
+        <h3>{{ p.title }}</h3>
+        {% set paras = p.body|paragraphs %}
+        {% if paras %}<p>{{ paras[0] }}</p>{% endif %}
+        {% if p.meta %}<p class="meta">{{ p.meta }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ---------- Experience preview ---------- #}
+{% if c.experience %}
+<section class="section section-ruled">
+  <div class="wrap">
+    <header class="section-head section-head-row">
+      <div>
+        <p class="eyebrow">Experience</p>
+        <h2 class="section-title">Where I've worked</h2>
+      </div>
+      <a class="link-arrow" href="/experience">Full history <span aria-hidden="true">→</span></a>
+    </header>
+
+    <ul class="rows">
+      {% for r in c.experience[:5] %}
+      <li class="row reveal">
+        <span class="row-when">{{ r.period }}</span>
+        <span class="row-main">{{ r.role }}</span>
+        <span class="row-sub">{{ r.org }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

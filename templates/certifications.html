@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_head, block_head %}
+
+{% block title %}Certifications — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
+{% block description %}{{ intro.intro or "Certifications" }}{% endblock %}
+
+{% block content %}
+{{ page_head("Credentials", intro, "Certifications") }}
+
+{% for group, items in cert_groups %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head(items|length ~ (" credential" if items|length == 1 else " credentials"), group) }}
+    <ul class="table certs">
+      {% for cert in items %}
+      <li class="table-row reveal">
+        <span class="code">{{ cert.code or "CERT" }}</span>
+        <span class="t-name">{{ cert.name }}</span>
+        <span class="t-desc">{{ [cert.issuer, cert.note]|select|join(" · ") }}</span>
+        <span class="t-links">
+          {% if cert.file %}<a href="{{ cert.file }}" target="_blank" rel="noopener">Certificate ↗</a>{% endif %}
+          {% if cert.url %}<a href="{{ cert.url }}" target="_blank" rel="noopener">Verify ↗</a>{% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endfor %}
+
+{% if c.recognition %}
+<section class="section section-ruled">
+  <div class="wrap">
+    {{ block_head("Community", "Recognition") }}
+    <div class="cells cells-3">
+      {% for r in c.recognition %}
+      <article class="cell reveal">
+        <h3>{{ r.title }}</h3>
+        {% for para in r.body|paragraphs %}<p>{{ para }}</p>{% endfor %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

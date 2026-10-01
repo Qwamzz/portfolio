@@ -105,13 +105,14 @@
         text.appendChild(el("strong", null, item[spec.title_field] || "(untitled)"));
         var summary = summarise(item);
         if (summary) text.appendChild(el("span", null, summary));
-        if (item.file) {
-          var fileLink = el("a", null, "View uploaded file");
-          fileLink.href = item.file;
+        spec.fields.forEach(function (field) {
+          if (field.type !== "file" || !item[field.name]) return;
+          var fileLink = el("a", null, "View " + field.label.toLowerCase());
+          fileLink.href = item[field.name];
           fileLink.target = "_blank";
           fileLink.rel = "noopener";
           text.appendChild(fileLink);
-        }
+        });
         li.appendChild(text);
 
         if (!spec.single) {
@@ -119,12 +120,12 @@
           li.appendChild(moveButton(item, "down", "↓", index === data.items.length - 1));
         }
 
-        var edit = el("button", "btn btn-outline", "Edit");
+        var edit = el("button", "btn btn-ghost", "Edit");
         edit.type = "button";
         edit.addEventListener("click", function () { openEditor(item); });
         li.appendChild(edit);
 
-        var remove = el("button", "btn btn-outline danger", "Delete");
+        var remove = el("button", "btn btn-ghost danger", "Delete");
         remove.type = "button";
         remove.addEventListener("click", function () {
           var name = item[spec.title_field] || "this entry";
@@ -144,7 +145,7 @@
   }
 
   function moveButton(item, direction, glyph, disabled) {
-    var button = el("button", "btn btn-outline move", glyph);
+    var button = el("button", "btn btn-ghost move", glyph);
     button.type = "button";
     button.disabled = disabled;
     button.title = direction === "up" ? "Move up" : "Move down";
@@ -210,9 +211,18 @@
       label.appendChild(control);
 
       if (field.type === "textarea" || field.type === "lines" || field.type === "file") {
-        if (field.type === "file" && item && item.file) {
-          var current_file = el("span", "admin-hint", "Currently: " + item.file + " (choose a file to replace it)");
-          label.appendChild(current_file);
+        if (field.type === "file" && item && item[field.name]) {
+          label.appendChild(el("span", "admin-hint", "Current file: " + item[field.name] + " - choose a new one to replace it"));
+          var removeLabel = el("label", "check");
+          var removeBox = document.createElement("input");
+          removeBox.type = "checkbox";
+          removeBox.name = "remove_" + field.name;
+          removeBox.value = "1";
+          removeLabel.appendChild(removeBox);
+          removeLabel.appendChild(document.createTextNode("Remove the current file"));
+          wide.appendChild(label);
+          wide.appendChild(removeLabel);
+          return;
         }
         wide.appendChild(label);
       } else {
