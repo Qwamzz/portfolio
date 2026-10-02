@@ -45,7 +45,7 @@
     </a>
 
     <nav class="nav-pill" aria-label="Primary">
-      {% set links = [("/", "home", "Home"), ("/experience", "experience", "Experience"), ("/projects", "projects", "Work"), ("/certifications", "certifications", "Certifications"), ("/education", "education", "Education")] %}
+      {% set links = [("/", "home", "Home"), ("/experience", "experience", "Experience"), ("/projects", "projects", "Projects"), ("/certifications", "certifications", "Certifications"), ("/education", "education", "Education")] %}
       {% for href, key, label in links %}
         <a href="{{ href }}"{% if page == key %} class="is-active" aria-current="page"{% endif %}>{{ label }}</a>
       {% endfor %}

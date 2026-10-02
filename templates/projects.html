@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% from "_macros.html" import page_head, block_head %}
 
-{% block title %}Work — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
-{% block description %}{{ intro.intro or "Selected cloud engineering work" }}{% endblock %}
+{% block title %}Projects — {{ profile.name or "Nii Yartey Gidiglo" }}{% endblock %}
+{% block description %}{{ intro.intro or "Selected cloud engineering projects" }}{% endblock %}
 
 {% block content %}
-{{ page_head("Work", intro, "Work") }}
+{{ page_head("Projects", intro, "Projects") }}
 
 {% if c.projects %}
 <section class="section section-ruled">
