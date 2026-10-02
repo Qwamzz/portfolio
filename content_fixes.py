@@ -8,6 +8,9 @@ through /admin no longer matches and is left alone.
 """
 
 FIELD_FIXES = [
+    # Projects page renamed from "Work".
+    ("pages", "page-projects", "title", "Work", "Projects"),
+
     # Availability line reworded.
     ("profile", "profile", "availability",
      "Open to cloud and security engagements", "Open to cloud and AI engagements"),
